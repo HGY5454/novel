@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="red.mlz.module.module.novelTagRelation.mapper.NovelTagRelationMapper">
+
+    <insert id="insert"
+            parameterType="red.mlz.module.module.novelTagRelation.entity.NovelTagRelation"
+            useGeneratedKeys="true">
+        insert into novel_tag_relation
+        (
+        <if test="novelTagRelation.novelId !=null "> novel_id,</if>
+        <if test="novelTagRelation.tagsId !=null "> tags_id,</if>
+        <if test="novelTagRelation.uk !=null "> uk,</if>
+        <if test="novelTagRelation.createTime != null">create_time,</if>
+        <if test="novelTagRelation.updateTime != null">update_time,</if>
+        is_deleted
+        )
+        value(
+        <if test="novelTagRelation.novelId !=null ">#{novelTagRelation.novelId},</if>
+        <if test="novelTagRelation.tagsId !=null ">#{novelTagRelation.tagsId},</if>
+        <if test="novelTagRelation.uk !=null ">#{novelTagRelation.uk,</if>
+        <if test="novelTagRelation.createTime != null">#{novelTagRelation.create_time},</if>
+        <if test="novelTagRelation.updateTime != null">#{novelTagRelation.update_time},</if>
+        #{novelTagRelation.is_deleted}
+        )
+    </insert>
+    <update id="update"
+            parameterType="red.mlz.module.module.novelTagRelation.entity.NovelTagRelation"
+            useGeneratedKeys="true">
+        update user set uk = #{novelTagRelation.uk},
+
+        <if test="novelTagRelation.phone !=null">phone=#{novelTagRelation.novelId},</if>
+        <if test="novelTagRelation.avatar !=null">avatar=#{novelTagRelation.tagsId},</if>
+        <if test="novelTagRelation.createTime !=null"> create_time=#{novelTagRelation.createTime},</if>
+        <if test="novelTagRelation.updateTime !=null"> update_time=#{novelTagRelation.updateTime},</if>
+        <if test="novelTagRelation.isDeleted !=null"> is_deleted=#{novelTagRelation.isDeleted}</if>
+
+        WHERE uk=#{novelTagRelation.uk},
+    </update>
+</mapper>

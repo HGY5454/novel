@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="red.mlz.module.module.tags.mapper.TagsMapper">
+
+    <insert id="insert"
+            parameterType="red.mlz.module.module.tags.entity.Tag"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        insert into tags
+        (
+        <if test="tag.id !=null "> id,</if>
+        <if test="tag.tagName !=null "> tag_name,</if>
+        <if test="tag.createTime != null">create_time,</if>
+        <if test="tag.updateTime != null">update_time,</if>
+        is_deleted
+        )
+        value(
+        <if test="tag.id !=null ">#{tag.id},</if>
+        <if test="tag.tagName !=null ">#{tag.tagName},</if>
+        <if test="tag.createTime != null">#{tag.createTime},</if>
+        <if test="tag.updateTime != null">#{tag.updateTime},</if>
+        #{tag.isDeleted}
+        )
+    </insert>
+</mapper>
