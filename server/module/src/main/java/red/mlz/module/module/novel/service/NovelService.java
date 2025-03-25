@@ -1,8 +1,16 @@
 package red.mlz.module.module.novel.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.mapper.NovelMapper;
 import org.springframework.stereotype.Service;
+import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
+import red.mlz.module.module.novelTagRelation.mapper.NovelTagRelationMapper;
+import red.mlz.module.module.tags.entity.Tag;
+import red.mlz.module.module.tags.mapper.TagsMapper;
+import red.mlz.module.utils.BaseUtils;
+import red.mlz.module.utils.Response;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -12,6 +20,12 @@ import java.util.List;
 public class NovelService {
     @Resource
     private NovelMapper mapper;
+    @Resource
+    private NovelTagRelationMapper relationMapper;
+    @Resource
+    private TagsMapper tagMapper;
+    @Autowired
+    private NovelTagRelationMapper novelTagRelationMapper;
 
     public Novel getById(BigInteger id) {
         return mapper.getById(id);
@@ -38,7 +52,8 @@ public class NovelService {
         return mapper.getAll();
     }
 
-    public BigInteger editNovel(BigInteger novelId,String title, String images,String author,Float score,Integer worldCount,String synopsis,BigInteger kindsId) {
+    @Transactional(rollbackFor = Exception.class)
+    public BigInteger editNovel(BigInteger novelId,String title, String images,String author,Float score,Integer worldCount,String synopsis,BigInteger kindsId,List<String> tags) {
 
         int timestamp = (int) (System.currentTimeMillis() / 1000);
 
@@ -53,13 +68,13 @@ public class NovelService {
         if(author == null || author.length() <= 0 || author.length() >= 10){
             throw new RuntimeException("author长度应在0~10之间");
         }
-        if (score>=10) {
+        if(score>=10) {
             throw new RuntimeException("score的值应该在0~10");
         }
-        if (worldCount<0) {
+        if(worldCount<0) {
             throw new RuntimeException("wordCount的值应大于0");
         }
-        if (synopsis == null || synopsis.length() > 50){
+        if(synopsis == null || synopsis.length() > 50){
             throw new RuntimeException("synopsis长度应在0~50之间");
         }
         novel.setTitle(title);
@@ -70,16 +85,41 @@ public class NovelService {
         novel.setSynopsis(synopsis);
         novel.setKindsId(kindsId);
         novel.setUpdateTime(timestamp);
-        if (novelId != null) {
-            if (getById(novelId) == null) {
+
+        for(String tagName : tags) {
+            Tag tag = new Tag();
+            tag.setTagName(tagName);
+            tag.setCreateTime(timestamp);
+            tag.setUpdateTime(timestamp);
+            tag.setIsDelete(0);
+            tagMapper.insert(tag);
+        }
+
+
+        if(novelId != null) {
+            if(getById(novelId) == null) {
                 throw new RuntimeException("系统异常");
             }
             novel.setId(novelId);
             update(novel);
+
         }else{
             novel.setCreateTime(timestamp);
             novel.setIsDeleted(0);
             insert(novel);
+        }
+        try{
+            for(String tagName : tags) {
+                NovelTagRelation novelTagRelation = new NovelTagRelation();
+                novelTagRelation.setNovelId(novelId);
+                novelTagRelation.setTagsId(tagMapper.getTagsIdByTagName(tagName));
+                novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
+                novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
+                novelTagRelation.setIsDelete(0);
+                novelTagRelationMapper.insert(novelTagRelation);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return novel.getId();
     }
@@ -98,6 +138,7 @@ public class NovelService {
     public int updateInfo(BigInteger id,String info){
         return mapper.updateInfo(id,info);
     }
+
     public String getNovelInfo(BigInteger id) {
         return mapper.getInfo(id);
     }

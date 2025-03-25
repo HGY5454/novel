@@ -21,9 +21,11 @@ public class TagsService {
     public Tag extractByTagName(String tagName) {
         return tagsMapper.extractByTagName(tagName);
     }
+
     public List<Tag> findAll() {
         return tagsMapper.getAllTags();
     }
+
     public int getTagsIdByTagName(String tagName) {
         return tagsMapper.getTagsIdByTagName(tagName);
     }

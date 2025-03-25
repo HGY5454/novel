@@ -82,7 +82,6 @@ public class NovelController {
 
     }
     @RequestMapping("novel/create")
-    @Transactional(rollbackFor = Exception.class)
     public Response createNovel(@RequestParam(name = "title") String title,
                                 @RequestParam(name = "images")String images,
                                 @RequestParam(name = "author")String author,
@@ -94,49 +93,17 @@ public class NovelController {
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
-        if (BaseUtils.isEmpty(title)|BaseUtils.isEmpty(images)|BaseUtils.isEmpty(author)|BaseUtils.isEmpty(synopsis)|BaseUtils.isEmpty(kindsId)) {
-            return new Response<>(1002);
+        if(BaseUtils.isEmpty(title)||BaseUtils.isEmpty(images)||BaseUtils.isEmpty(author)|BaseUtils.isEmpty(synopsis)||BaseUtils.isEmpty(kindsId)) {
+           return new Response<>(1002);
         }
-        if (kindsService.getKindsById(kindsId) != null){
+        if(kindsService.getKindsById(kindsId) != null){
             BigInteger novelId = null;
             BigInteger result = null;
-        try {
-            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId);
+        try{
+            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
         } catch (Exception e)
         {
             log.info("系统异常");
-        }
-        try {
-            List<Tag> AllTags =tagsService.findAll();
-            for (Tag tag : AllTags) {
-                for (String tagName : tags){
-                    if (tag.getTagName().equals(tagName)){
-                        NovelTagRelation novelTagRelation = new NovelTagRelation();
-                        novelTagRelation.setNovelId(result);
-                        novelTagRelation.setTagsId(tag.getId());
-                        novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setIsDelete(0);
-                        novelTagRelationService.insert(novelTagRelation);
-                    }else {
-                        Tag newTag = new Tag();
-                        tag.setTagName(tagName);
-                        tag.setCreateTime(BaseUtils.currentSeconds());
-                        tag.setUpdateTime(BaseUtils.currentSeconds());
-                        tag.setIsDelete(0);
-                        NovelTagRelation novelTagRelation = new NovelTagRelation();
-                        novelTagRelation.setNovelId(result);
-                        novelTagRelation.setTagsId(tagsService.insert(newTag));
-                        novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setIsDelete(0);
-                        novelTagRelationService.insert(novelTagRelation);
-                    }
-                    ;
-                }
-            }
-        }catch (Exception e){
-            return new Response<>(4004);
         }
             return new Response<>(1001,"novelId="+result);
         }else {
@@ -157,48 +124,17 @@ public class NovelController {
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
-        if (BaseUtils.isEmpty(title)|BaseUtils.isEmpty(images)|BaseUtils.isEmpty(author)|BaseUtils.isEmpty(synopsis)|BaseUtils.isEmpty(kindsId)) {
+        if (BaseUtils.isEmpty(title)||BaseUtils.isEmpty(images)||BaseUtils.isEmpty(author)||BaseUtils.isEmpty(synopsis)||BaseUtils.isEmpty(kindsId)) {
             return new Response<>(1002);
         }
         BigInteger result = null;
         try {
-            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId);
+            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
         } catch (RuntimeException e)
         {
             log.info("系统异常");
         }
-        try {
-            List<Tag> AllTags =tagsService.findAll();
-            for (Tag tag : AllTags) {
-                for (String tagName : tags){
-                    if (tag.getTagName().equals(tagName)){
-                        NovelTagRelation novelTagRelation = new NovelTagRelation();
-                        novelTagRelation.setNovelId(result);
-                        novelTagRelation.setTagsId(tag.getId());
-                        novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setIsDelete(0);
-                        novelTagRelationService.insert(novelTagRelation);
-                    }else {
-                        Tag newTag = new Tag();
-                        tag.setTagName(tagName);
-                        tag.setCreateTime(BaseUtils.currentSeconds());
-                        tag.setUpdateTime(BaseUtils.currentSeconds());
-                        tag.setIsDelete(0);
-                        NovelTagRelation novelTagRelation = new NovelTagRelation();
-                        novelTagRelation.setNovelId(result);
-                        novelTagRelation.setTagsId(tagsService.insert(newTag));
-                        novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                        novelTagRelation.setIsDelete(0);
-                        novelTagRelationService.insert(novelTagRelation);
-                    }
-                    ;
-                }
-            }
-        }catch (Exception e){
-            return new Response<>(4004);
-        }
+
         return new Response(1001,"novelId="+result);
 
     }
