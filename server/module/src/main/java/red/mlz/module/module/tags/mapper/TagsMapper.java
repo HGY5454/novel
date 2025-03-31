@@ -21,9 +21,9 @@ public interface TagsMapper {
     List<Tag> getAllTags();
 
     @Select("select id from tags where tag_name = #{tagName} and is_deleted = 0")
-    int getTagsIdByTagName(@Param("tagName") String tagName);
+    int getTagIdByTagName(@Param("tagName") String tagName);
 
-    int insert(@Param("tag") Tag tag);
+    int insert(@Param("tag")Tag tag);
 
     int update(@Param("tag") Tag tag);
 

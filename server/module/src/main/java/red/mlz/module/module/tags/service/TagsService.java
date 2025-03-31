@@ -26,11 +26,10 @@ public class TagsService {
         return tagsMapper.getAllTags();
     }
 
-    public int getTagsIdByTagName(String tagName) {
-        return tagsMapper.getTagsIdByTagName(tagName);
+    public int getTagIdByTagName(String tagName) {return tagsMapper.getTagIdByTagName(tagName);
     }
 
-    public Integer insert(Tag tag) {
+    public BigInteger insert(Tag tag) {
         tagsMapper.insert(tag);
         return tag.getId();
     }

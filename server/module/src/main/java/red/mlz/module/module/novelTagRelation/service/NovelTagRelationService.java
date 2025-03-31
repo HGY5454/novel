@@ -26,4 +26,8 @@ public class NovelTagRelationService {
     public int delete(BigInteger id) {
         return novelTagRelationMapper.delete(id, BaseUtils.currentSeconds());
     }
+    @Transactional(rollbackFor = Exception.class)
+    public NovelTagRelation SelectByNovelIdaAndTagsId(BigInteger novelId, BigInteger tagId) {
+        return novelTagRelationMapper.SelectByNovelIdaAndTagsId(novelId, tagId);
+    }
 }

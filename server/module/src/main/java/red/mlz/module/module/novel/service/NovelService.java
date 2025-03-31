@@ -7,25 +7,26 @@ import red.mlz.module.module.novel.mapper.NovelMapper;
 import org.springframework.stereotype.Service;
 import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
 import red.mlz.module.module.novelTagRelation.mapper.NovelTagRelationMapper;
+import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
 import red.mlz.module.module.tags.entity.Tag;
 import red.mlz.module.module.tags.mapper.TagsMapper;
+import red.mlz.module.module.tags.service.TagsService;
 import red.mlz.module.utils.BaseUtils;
 import red.mlz.module.utils.Response;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class NovelService {
     @Resource
     private NovelMapper mapper;
-    @Resource
-    private NovelTagRelationMapper relationMapper;
-    @Resource
-    private TagsMapper tagMapper;
-    @Autowired
-    private NovelTagRelationMapper novelTagRelationMapper;
+
+    TagsService tagsService = new TagsService();
+
+    NovelTagRelationService novelTagRelationService = new NovelTagRelationService();
 
     public Novel getById(BigInteger id) {
         return mapper.getById(id);
@@ -53,7 +54,7 @@ public class NovelService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public BigInteger editNovel(BigInteger novelId,String title, String images,String author,Float score,Integer worldCount,String synopsis,BigInteger kindsId,List<String> tags) {
+    public BigInteger editNovel(BigInteger novelId,String title, String images,String author,Float score,Integer worldCount,String synopsis,BigInteger kindsId,String tags) {
 
         int timestamp = (int) (System.currentTimeMillis() / 1000);
 
@@ -65,7 +66,7 @@ public class NovelService {
         if(images == null || images.length() > 400){
             throw new RuntimeException("images长度应在0~400之间");
         }
-        if(author == null || author.length() <= 0 || author.length() >= 10){
+        if(author == null || author.isEmpty() || author.length() >= 10){
             throw new RuntimeException("author长度应在0~10之间");
         }
         if(score>=10) {
@@ -86,39 +87,45 @@ public class NovelService {
         novel.setKindsId(kindsId);
         novel.setUpdateTime(timestamp);
 
-        for(String tagName : tags) {
-            Tag tag = new Tag();
-            tag.setTagName(tagName);
-            tag.setCreateTime(timestamp);
-            tag.setUpdateTime(timestamp);
-            tag.setIsDelete(0);
-            tagMapper.insert(tag);
+        List<BigInteger> tagIds = new ArrayList<>();
+        for(String tagName : tags.split(",")){
+            Tag tag = tagsService.extractByTagName(tagName);
+            if (tag == null){
+                tag.setTagName(tagName);
+                tag.setCreateTime(timestamp);
+                tag.setUpdateTime(timestamp);
+                tag.setIsDelete(0);
+                BigInteger tagId = tagsService.insert(tag);
+                tagIds.add(tagId);
+            }else{
+                tagIds.add(tag.getId());
+            }
         }
-
 
         if(novelId != null) {
-            if(getById(novelId) == null) {
-                throw new RuntimeException("系统异常");
-            }
-            novel.setId(novelId);
-            update(novel);
-
+           if(getById(novelId) == null) {
+              throw new RuntimeException("系统异常");
+           }
+           novel.setId(novelId);
+           update(novel);
         }else{
-            novel.setCreateTime(timestamp);
-            novel.setIsDeleted(0);
-            insert(novel);
+           novel.setCreateTime(timestamp);
+           novel.setIsDeleted(0);
+           insert(novel);
         }
         try{
-            for(String tagName : tags) {
-                NovelTagRelation novelTagRelation = new NovelTagRelation();
-                novelTagRelation.setNovelId(novelId);
-                novelTagRelation.setTagsId(tagMapper.getTagsIdByTagName(tagName));
-                novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                novelTagRelation.setIsDelete(0);
-                novelTagRelationMapper.insert(novelTagRelation);
+            for(BigInteger tagId : tagIds) {
+                if(novelTagRelationService.SelectByNovelIdaAndTagsId(novelId,tagId) == null) {
+                   NovelTagRelation novelTagRelation = new NovelTagRelation();
+                   novelTagRelation.setNovelId(novelId);
+                   novelTagRelation.setTagId(tagId);
+                   novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
+                   novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
+                   novelTagRelation.setIsDelete(0);
+                   novelTagRelationService.insert(novelTagRelation);
+                }
             }
-        }catch (Exception e){
+        }catch(Exception e){
             e.printStackTrace();
         }
         return novel.getId();

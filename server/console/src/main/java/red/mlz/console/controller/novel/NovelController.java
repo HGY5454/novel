@@ -89,7 +89,7 @@ public class NovelController {
                                 @RequestParam(name = "wordCount")Integer wordCount,
                                 @RequestParam(name = "synopsis")String synopsis,
                                 @RequestParam(name = "kindsId")BigInteger kindsId,
-                                @RequestParam(name= "tags")List<String> tags){
+                                @RequestParam(name= "tags")String tags){
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
@@ -97,10 +97,9 @@ public class NovelController {
            return new Response<>(1002);
         }
         if(kindsService.getKindsById(kindsId) != null){
-            BigInteger novelId = null;
             BigInteger result = null;
         try{
-            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
+            result=novelService.editNovel(null,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
         } catch (Exception e)
         {
             log.info("系统异常");
@@ -120,7 +119,7 @@ public class NovelController {
                                 @RequestParam(name = "wordCount")Integer wordCount,
                                 @RequestParam(name = "synopsis")String synopsis,
                                 @RequestParam(name = "kindsId")BigInteger kindsId,
-                                @RequestParam(name= "tags")List<String> tags){
+                                @RequestParam(name= "tags")String tags){
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }

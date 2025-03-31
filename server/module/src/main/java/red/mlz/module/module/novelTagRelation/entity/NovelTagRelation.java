@@ -9,7 +9,7 @@ import java.util.List;
 public class NovelTagRelation {
     private String id;
     private BigInteger novelId;
-    private Integer tagsId;
+    private BigInteger tagId;
     private Integer createTime;
     private Integer updateTime;
     private Integer isDelete;

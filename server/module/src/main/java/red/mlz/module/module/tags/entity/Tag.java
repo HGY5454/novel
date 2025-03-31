@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 @Data
 public class Tag {
-    private Integer id;
+    private BigInteger id;
     private String tagName;
     private Integer createTime;
     private Integer updateTime;
