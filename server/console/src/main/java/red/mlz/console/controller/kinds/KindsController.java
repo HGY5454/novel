@@ -35,29 +35,28 @@ public class KindsController {
     private NovelService novelService;
 
     @RequestMapping("/kinds/kinds_info")
-    public Response getKinds(@RequestParam(name="kindsId")BigInteger kindsId)
-    {
-        return new Response<>(1001,kindsService.getKindsById(kindsId));
+    public Response getKinds(@RequestParam(name = "kindsId") BigInteger kindsId) {
+        return new Response<>(1001, kindsService.getKindsById(kindsId));
     }
+
     @RequestMapping("/kinds/createKinds")
-    public Response createKinds(@RequestParam(name="kindsName")String kindsName,
-                              @RequestParam(name= "kindsImages")String kindsImages)
-    {
-        int result =kindsService.insertKinds(kindsName, kindsImages);
+    public Response createKinds(@RequestParam(name = "kindsName") String kindsName,
+                                @RequestParam(name = "kindsImages") String kindsImages) {
+        int result = kindsService.insertKinds(kindsName, kindsImages);
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
+
     @RequestMapping("/kinds/updateKinds")
-    public Response updateKinds(@RequestParam(name="kindsId")BigInteger kindsId,
-                              @RequestParam(name="kindsName")String kindsName,
-                              @RequestParam(name= "kindsImages")String kindsImages)
-    {
-        int result =kindsService.updateKinds(kindsId,kindsName, kindsImages);
+    public Response updateKinds(@RequestParam(name = "kindsId") BigInteger kindsId,
+                                @RequestParam(name = "kindsName") String kindsName,
+                                @RequestParam(name = "kindsImages") String kindsImages) {
+        int result = kindsService.updateKinds(kindsId, kindsName, kindsImages);
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
+
     @RequestMapping("/kinds/deleteKinds")
-    public Response deleteKinds(@RequestParam(name="id")BigInteger id)
-    {
-        int result =kindsService.deleteKinds(id);
+    public Response deleteKinds(@RequestParam(name = "id") BigInteger id) {
+        int result = kindsService.deleteKinds(id);
         List<Novel> novelList = novelService.getNovelByKindsId(id);
         for (Novel novel : novelList) {
             BigInteger kindsId = novel.getKindsId();
@@ -67,19 +66,19 @@ public class KindsController {
     }
 
     @RequestMapping("/kinds/kinds_tree")
-    public Response kindsTree(){
+    public Response kindsTree() {
 
         List<Kinds> allKinds = kindsService.getAllKinds();
 
         List<KindsTreeVo> allKindsTreeVo = new ArrayList<>();
 
         for (Kinds kinds : allKinds) {
-                KindsTreeVo kindsTreeVo = new KindsTreeVo();
-                kindsTreeVo.setId(kinds.getId());
-                kindsTreeVo.setKindsName(kinds.getKindsName());
-                kindsTreeVo.setKindsImage(kinds.getKindsImage());
-                kindsTreeVo.setParentId(kinds.getParentId());
-                allKindsTreeVo.add(kindsTreeVo);
+            KindsTreeVo kindsTreeVo = new KindsTreeVo();
+            kindsTreeVo.setId(kinds.getId());
+            kindsTreeVo.setKindsName(kinds.getKindsName());
+            kindsTreeVo.setKindsImage(kinds.getKindsImage());
+            kindsTreeVo.setParentId(kinds.getParentId());
+            allKindsTreeVo.add(kindsTreeVo);
         }
         Map<BigInteger, KindsTreeVo> map = new HashMap<>();
         for (KindsTreeVo kindsTreeVo : allKindsTreeVo) {

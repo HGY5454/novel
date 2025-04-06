@@ -22,5 +22,5 @@ public interface NovelTagRelationMapper {
                                                @Param("tagId") BigInteger tagId);
 
     @Update("update novel_tag_relation set is_deleted = 1,update_time=#{time} where id = #{id} limit 1")
-    int delete(@Param("id") BigInteger id, @Param("time")Integer time);
+    int delete(@Param("id") BigInteger id, @Param("time") Integer time);
 }

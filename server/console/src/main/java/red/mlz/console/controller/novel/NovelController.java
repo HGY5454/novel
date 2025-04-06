@@ -2,7 +2,6 @@ package red.mlz.console.controller.novel;
 
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +13,8 @@ import red.mlz.console.domain.novel.*;
 import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.service.NovelService;
-import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
 import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
-import red.mlz.module.module.tags.entity.Tag;
-import red.mlz.module.module.tags.service.TagsService;
+import red.mlz.module.module.tags.service.TagService;
 import red.mlz.module.module.user.entity.User;
 import red.mlz.module.utils.BaseUtils;
 import red.mlz.module.utils.Response;
@@ -36,15 +33,17 @@ public class NovelController {
     @Autowired
     private KindsService kindsService;
     @Autowired
-    private TagsService tagsService;
+    private TagService tagService;
     @Autowired
     private NovelTagRelationService novelTagRelationService;
 
     @RequestMapping("novel/novelList")
     @Transactional(rollbackFor = Exception.class)
     public Response novelList(@VerifiedUser User loginUser,
-                              @RequestParam(name="page")Integer page,
-                              @RequestParam(name= "titleKeyWord",required = false)String titleKeyWord, HttpServletResponse httpServletResponse, HttpServletRequest httpServletRequest) {
+                              @RequestParam(name = "page") Integer page,
+                              @RequestParam(name = "titleKeyWord", required = false) String titleKeyWord,
+                              HttpServletResponse httpServletResponse,
+                              HttpServletRequest httpServletRequest) {
 
         if (BaseUtils.isEmpty(loginUser)) {
             return new Response(1003);
@@ -52,8 +51,8 @@ public class NovelController {
         Integer pageSize = 4;
         List<String> kindsIdList = novelService.getKindsIdByKeyword(titleKeyWord);
         String ids = String.join(",", kindsIdList);
-        Integer total = novelService.getNovelCount(titleKeyWord,ids);
-        List<Novel> novelList = novelService.getNovelListByPage(page,pageSize,titleKeyWord,ids);
+        Integer total = novelService.getNovelCount(titleKeyWord, ids);
+        List<Novel> novelList = novelService.getNovelListByPage(page, pageSize, titleKeyWord, ids);
         NovelListVo novelListVo = new NovelListVo();
         novelListVo.setList(new ArrayList<>());
 
@@ -78,34 +77,34 @@ public class NovelController {
         novelListVo.setTotal(total);
         novelListVo.setPageSize(pageSize);
 
-        return new Response<>(1001,novelListVo);
+        return new Response<>(1001, novelListVo);
 
     }
+
     @RequestMapping("novel/create")
     public Response createNovel(@RequestParam(name = "title") String title,
-                                @RequestParam(name = "images")String images,
-                                @RequestParam(name = "author")String author,
-                                @RequestParam(name = "score",required = false, defaultValue ="0")Float score,
-                                @RequestParam(name = "wordCount")Integer wordCount,
-                                @RequestParam(name = "synopsis")String synopsis,
-                                @RequestParam(name = "kindsId")BigInteger kindsId,
-                                @RequestParam(name= "tags")String tags){
+                                @RequestParam(name = "images") String images,
+                                @RequestParam(name = "author") String author,
+                                @RequestParam(name = "score", required = false, defaultValue = "0") Float score,
+                                @RequestParam(name = "wordCount") Integer wordCount,
+                                @RequestParam(name = "synopsis") String synopsis,
+                                @RequestParam(name = "kindsId") BigInteger kindsId,
+                                @RequestParam(name = "tags") String tags) {
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
-        if(BaseUtils.isEmpty(title)||BaseUtils.isEmpty(images)||BaseUtils.isEmpty(author)|BaseUtils.isEmpty(synopsis)||BaseUtils.isEmpty(kindsId)) {
-           return new Response<>(1002);
+        if (BaseUtils.isEmpty(title) || BaseUtils.isEmpty(images) || BaseUtils.isEmpty(author) | BaseUtils.isEmpty(synopsis) || BaseUtils.isEmpty(kindsId)) {
+            return new Response<>(1002);
         }
-        if(kindsService.getKindsById(kindsId) != null){
+        if (kindsService.getKindsById(kindsId) != null) {
             BigInteger result = null;
-        try{
-            result=novelService.editNovel(null,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
-        } catch (Exception e)
-        {
-            log.info("系统异常");
-        }
-            return new Response<>(1001,"novelId="+result);
-        }else {
+            try {
+                result = novelService.editNovel(null, title.trim(), images.trim(), author.trim(), score, wordCount, synopsis.trim(), kindsId, tags);
+            } catch (Exception e) {
+                log.info("系统异常");
+            }
+            return new Response<>(1001, "novelId=" + result);
+        } else {
             return new Response<>(3053);
         }
     }
@@ -113,32 +112,32 @@ public class NovelController {
     @RequestMapping("/novel/update")
     public Response updateNovel(@RequestParam(name = "novelId") BigInteger novelId,
                                 @RequestParam(name = "title") String title,
-                                @RequestParam(name = "images")String images,
-                                @RequestParam(name = "author")String author,
-                                @RequestParam(name = "score",required = false, defaultValue ="0")Float score,
-                                @RequestParam(name = "wordCount")Integer wordCount,
-                                @RequestParam(name = "synopsis")String synopsis,
-                                @RequestParam(name = "kindsId")BigInteger kindsId,
-                                @RequestParam(name= "tags")String tags){
+                                @RequestParam(name = "images") String images,
+                                @RequestParam(name = "author") String author,
+                                @RequestParam(name = "score", required = false, defaultValue = "0") Float score,
+                                @RequestParam(name = "wordCount") Integer wordCount,
+                                @RequestParam(name = "synopsis") String synopsis,
+                                @RequestParam(name = "kindsId") BigInteger kindsId,
+                                @RequestParam(name = "tags") String tags) {
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
-        if (BaseUtils.isEmpty(title)||BaseUtils.isEmpty(images)||BaseUtils.isEmpty(author)||BaseUtils.isEmpty(synopsis)||BaseUtils.isEmpty(kindsId)) {
+        if (BaseUtils.isEmpty(title) || BaseUtils.isEmpty(images) || BaseUtils.isEmpty(author) || BaseUtils.isEmpty(synopsis) || BaseUtils.isEmpty(kindsId)) {
             return new Response<>(1002);
         }
         BigInteger result = null;
         try {
-            result=novelService.editNovel(novelId,title.trim(),images.trim(),author.trim(),score,wordCount,synopsis.trim(),kindsId,tags);
-        } catch (RuntimeException e)
-        {
+            result = novelService.editNovel(novelId, title.trim(), images.trim(), author.trim(), score, wordCount, synopsis.trim(), kindsId, tags);
+        } catch (RuntimeException e) {
             log.info("系统异常");
         }
 
-        return new Response(1001,"novelId="+result);
+        return new Response(1001, "novelId=" + result);
 
     }
+
     @RequestMapping("/novel/delete")
-    public Response deleteNovel(@RequestParam(name="novelId") BigInteger novelId,
+    public Response deleteNovel(@RequestParam(name = "novelId") BigInteger novelId,
                                 @VerifiedUser User loginUser) {
         if (BaseUtils.isEmpty(loginUser)) {
             return new Response(1003);
@@ -146,16 +145,18 @@ public class NovelController {
         int result = novelService.delete(novelId);
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
+
     @RequestMapping("/novel/getInfo")
-    public Response getInfo(@RequestParam(name = "id")BigInteger id){
+    public Response getInfo(@RequestParam(name = "id") BigInteger id) {
         List<InfoVo> info = JSON.parseArray(novelService.getNovelInfo(id), InfoVo.class);
-        return new Response<>(1001,info);
+        return new Response<>(1001, info);
     }
+
     @RequestMapping("/novel/addInfo")
-    public Response addInfo(@RequestParam(name = "id")BigInteger id,
-                            @RequestParam(name = "infoType")String infoType,
-                            @RequestParam(name = "infoContent")String infoContent,
-                            @VerifiedUser User loginUser){
+    public Response addInfo(@RequestParam(name = "id") BigInteger id,
+                            @RequestParam(name = "infoType") String infoType,
+                            @RequestParam(name = "infoContent") String infoContent,
+                            @VerifiedUser User loginUser) {
         if (BaseUtils.isEmpty(loginUser)) {
             return new Response(1003);
         }
@@ -164,13 +165,14 @@ public class NovelController {
         infoVo.setType(infoType);
         infoVo.setContent(infoContent);
         info.add(infoVo);
-        int result = novelService.updateInfo(id,JSON.toJSONString(info));
+        int result = novelService.updateInfo(id, JSON.toJSONString(info));
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
+
     @RequestMapping("/novel/deleteInfo")
-    public Response deleteInfo(@RequestParam(name = "id")BigInteger id,
-                               @RequestParam(name = "infoType")String infoType,
-                               @VerifiedUser User loginUser){
+    public Response deleteInfo(@RequestParam(name = "id") BigInteger id,
+                               @RequestParam(name = "infoType") String infoType,
+                               @VerifiedUser User loginUser) {
         if (BaseUtils.isEmpty(loginUser)) {
             return new Response(1003);
         }
@@ -181,8 +183,8 @@ public class NovelController {
                 newInfo.add(infoVo);
             }
         }
-        novelService.updateInfo(id,JSON.toJSONString(info));
-        return new Response<>(1001,newInfo);
+        novelService.updateInfo(id, JSON.toJSONString(info));
+        return new Response<>(1001, newInfo);
     }
 
 }

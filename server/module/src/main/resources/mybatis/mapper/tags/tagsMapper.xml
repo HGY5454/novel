@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="red.mlz.module.module.tags.mapper.TagsMapper">
+<mapper namespace="red.mlz.module.module.tags.mapper.TagMapper">
 
     <insert id="insert"
             parameterType="red.mlz.module.module.tags.entity.Tag"

@@ -18,16 +18,19 @@ public class NovelTagRelationService {
     public int insert(NovelTagRelation novelTagRelation) {
         return novelTagRelationMapper.insert(novelTagRelation);
     }
+
     @Transactional(rollbackFor = Exception.class)
-    public int update(NovelTagRelation  novelTagRelation) {
+    public int update(NovelTagRelation novelTagRelation) {
         return novelTagRelationMapper.update(novelTagRelation);
     }
+
     @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger id) {
         return novelTagRelationMapper.delete(id, BaseUtils.currentSeconds());
     }
+
     @Transactional(rollbackFor = Exception.class)
-    public NovelTagRelation SelectByNovelIdaAndTagsId(BigInteger novelId, BigInteger tagId) {
+    public NovelTagRelation SelectByNovelIdAndTagId(BigInteger novelId, BigInteger tagId) {
         return novelTagRelationMapper.SelectByNovelIdaAndTagsId(novelId, tagId);
     }
 }

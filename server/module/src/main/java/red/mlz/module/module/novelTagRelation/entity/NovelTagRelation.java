@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class NovelTagRelation {
-    private String id;
+    private BigInteger id;
     private BigInteger novelId;
     private BigInteger tagId;
     private Integer createTime;
