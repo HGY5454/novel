@@ -14,7 +14,7 @@ import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.service.NovelService;
 import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
-import red.mlz.module.module.tags.service.TagService;
+import red.mlz.module.module.tag.service.TagService;
 import red.mlz.module.module.user.entity.User;
 import red.mlz.module.utils.BaseUtils;
 import red.mlz.module.utils.Response;

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="red.mlz.module.module.novel.mapper.NovelMapper">
+
     <insert id="insert"
             parameterType="red.mlz.module.module.novel.entity.Novel"
             useGeneratedKeys="true"
             keyProperty="id">
         insert into novel (
         <if test="novel.title != null and novel.title != '' ">title,</if>
-        <if test="novel.images != null and novel.images != '' ">images,</if>
+        <if test="novel.imagesUrl != null and novel.imagesUrl != '' ">images_url,</if>
         <if test="novel.author != null and novel.author != '' ">author,</if>
         <if test="novel.score != null">score,</if>
         <if test="novel.wordCount != null">word_count,</if>
@@ -19,7 +20,7 @@
         is_deleted)
         value (
         <if test="novel.title != null and novel.title != '' "> #{novel.title},</if>
-        <if test="novel.images != null and novel.images != '' ">#{novel.images},</if>
+        <if test="novel.imagesUrl != null and novel.imagesUrl != '' ">#{novel.imagesUrl},</if>
         <if test="novel.author != null and novel.author != '' "> #{novel.author},</if>
         <if test="novel.score != null">#{novel.score},</if>
         <if test="novel.wordCount != null">#{novel.wordCount},</if>
@@ -28,7 +29,7 @@
         <if test="novel.info !=null">#{info}</if>
         <if test="novel.createTime != null">#{novel.createTime},</if>
         <if test="novel.updateTime != null">#{novel.updateTime},</if>
-               #{novel.isDeleted})
+        #{novel.isDeleted})
     </insert>
 
     <select id="getPage" resultType="red.mlz.module.module.novel.entity.Novel">
@@ -53,7 +54,7 @@
             keyProperty="id">
         update novel set id = #{novel.id},
                          <if test="novel.title != null and novel.title != '' ">title = #{novel.title}</if>
-                         <if test="novel.images != null and novel.images != '' ">,images = #{novel.images}</if>
+                         <if test="novel.imagesUrl != null and novel.imagesUrl != '' ">,images_url = #{novel.imagesUrl}</if>
                          <if test="novel.author != null and novel.author != '' ">,author = #{novel.author}</if>
                          <if test="novel.score != null">,score = #{novel.score}</if>
                          <if test="novel.wordCount != null">,word_count = #{novel.wordCount}</if>

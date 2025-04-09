@@ -1,15 +1,13 @@
-package red.mlz.module.module.novelTagRelation.entity;
+package red.mlz.module.module.tag.entity;
 
 import lombok.Data;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @Data
-public class NovelTagRelation {
+public class Tag {
     private BigInteger id;
-    private BigInteger novelId;
-    private BigInteger tagId;
+    private String tagName;
     private Integer createTime;
     private Integer updateTime;
     private Integer isDeleted;

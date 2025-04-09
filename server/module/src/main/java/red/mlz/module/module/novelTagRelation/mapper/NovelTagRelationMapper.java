@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Update;
 import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
 
 import java.math.BigInteger;
+import java.util.List;
 
 @Mapper
 public interface NovelTagRelationMapper {
@@ -20,6 +21,9 @@ public interface NovelTagRelationMapper {
     @Select("SELECT * FROM novel_tag_relation WHERE novel_id = #{novelId} AND tag_id = #{tagId}")
     NovelTagRelation SelectByNovelIdaAndTagsId(@Param("novelId") BigInteger novelId,
                                                @Param("tagId") BigInteger tagId);
+
+    @Select("SELECT * FROM novel_tag_relation WHERE novel_id = #{novelId}")
+    List<NovelTagRelation> SelectByNovelId(@Param("novelId") BigInteger novelId);
 
     @Update("update novel_tag_relation set is_deleted = 1,update_time=#{time} where id = #{id} limit 1")
     int delete(@Param("id") BigInteger id, @Param("time") Integer time);

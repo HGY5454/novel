@@ -10,7 +10,6 @@ public class Novel {
     private BigInteger id;
     private String title;
     private String imagesUrl;
-    private Float ar;
     private String author;
     private Float score;
     private Integer wordCount;

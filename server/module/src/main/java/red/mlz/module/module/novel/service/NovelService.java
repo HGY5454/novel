@@ -1,14 +1,15 @@
 package red.mlz.module.module.novel.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.mapper.NovelMapper;
 import org.springframework.stereotype.Service;
 import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
 import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
-import red.mlz.module.module.tags.entity.Tag;
-import red.mlz.module.module.tags.service.TagService;
+import red.mlz.module.module.tag.entity.Tag;
+import red.mlz.module.module.tag.service.TagService;
 import red.mlz.module.utils.BaseUtils;
 
 import javax.annotation.Resource;
@@ -90,16 +91,16 @@ public class NovelService {
 
         List<BigInteger> tagIds = new ArrayList<>();
         for (String tagName : tags.split(",")) {
-            Tag tag = tagService.extractByTagName(tagName);
-            if (tag == null) {
-                tag.setTagName(tagName);
-                tag.setCreateTime(timestamp);
-                tag.setUpdateTime(timestamp);
-                tag.setIsDelete(0);
-                BigInteger tagId = tagService.insert(tag);
-                tagIds.add(tagId);
+            Tag existingTag = tagService.extractByTagName(tagName);
+            if (existingTag == null) {
+                Tag newTag = new Tag();
+                newTag.setTagName(tagName.trim());
+                newTag.setCreateTime(timestamp);
+                newTag.setUpdateTime(timestamp);
+                newTag.setIsDeleted(0);
+                tagIds.add(tagService.edit(newTag));
             } else {
-                tagIds.add(tag.getId());
+                tagIds.add(existingTag.getId());
             }
         }
 
@@ -113,22 +114,39 @@ public class NovelService {
             novel.setCreateTime(timestamp);
             novel.setIsDeleted(0);
             insert(novel);
+            novelId = novel.getId();
         }
         try {
-            for (BigInteger tagId : tagIds) {
-                BigInteger RelationId = novelTagRelationService.SelectByNovelIdAndTagId(novelId, tagId).getId();
-                if (RelationId == null) {
-                    NovelTagRelation novelTagRelation = new NovelTagRelation();
-                    novelTagRelation.setNovelId(novelId);
-                    novelTagRelation.setTagId(tagId);
-                    novelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-                    novelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-                    novelTagRelation.setIsDelete(0);
-                    novelTagRelationService.insert(novelTagRelation);
-                }else {
-                    novelTagRelationService.delete(RelationId);
-                }
+            List<NovelTagRelation> novelTagRelationList = novelTagRelationService.SelectByNovelId(novelId);
+            List<BigInteger> originalTagIds = new ArrayList<>();
+            for (NovelTagRelation novelTagRelation : novelTagRelationList) {
+                originalTagIds.add(novelTagRelation.getTagId());
             }
+            List<BigInteger> updatedTagIds = new ArrayList<>(tagIds);
+            updatedTagIds.retainAll(originalTagIds);
+            List<BigInteger> deleteTagIds = new ArrayList<>(originalTagIds);
+            deleteTagIds.removeAll(updatedTagIds);
+            List<BigInteger> createTagIds = new ArrayList<>(tagIds);
+            createTagIds.removeAll(updatedTagIds);
+
+            for (BigInteger tagId : deleteTagIds) {
+                novelTagRelationService.delete(tagId);
+            }
+            for (BigInteger tagId : createTagIds) {
+                NovelTagRelation novelTagRelation = new NovelTagRelation();
+                novelTagRelation.setNovelId(novelId);
+                novelTagRelation.setTagId(tagId);
+                novelTagRelation.setCreateTime(timestamp);
+                novelTagRelation.setUpdateTime(timestamp);
+                novelTagRelation.setIsDeleted(0);
+                novelTagRelationService.edit(novelTagRelation);
+            }
+            for (BigInteger tagId : updatedTagIds) {
+                NovelTagRelation novelTagRelation = novelTagRelationService.SelectByNovelIdAndTagId(novelId, tagId);
+                novelTagRelation.setUpdateTime(timestamp);
+                novelTagRelationService.edit(novelTagRelation);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
