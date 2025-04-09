@@ -32,10 +32,6 @@ public class NovelController {
     private NovelService novelService;
     @Autowired
     private KindsService kindsService;
-    @Autowired
-    private TagService tagService;
-    @Autowired
-    private NovelTagRelationService novelTagRelationService;
 
     @RequestMapping("novel/novelList")
     @Transactional(rollbackFor = Exception.class)
@@ -111,18 +107,18 @@ public class NovelController {
 
     @RequestMapping("/novel/update")
     public Response updateNovel(@RequestParam(name = "novelId") BigInteger novelId,
-                                @RequestParam(name = "title") String title,
-                                @RequestParam(name = "images") String images,
-                                @RequestParam(name = "author") String author,
+                                @RequestParam(name = "title", required = false) String title,
+                                @RequestParam(name = "images", required = false) String images,
+                                @RequestParam(name = "author", required = false) String author,
                                 @RequestParam(name = "score", required = false, defaultValue = "0") Float score,
-                                @RequestParam(name = "wordCount") Integer wordCount,
-                                @RequestParam(name = "synopsis") String synopsis,
-                                @RequestParam(name = "kindsId") BigInteger kindsId,
-                                @RequestParam(name = "tags") String tags) {
+                                @RequestParam(name = "wordCount", required = false) Integer wordCount,
+                                @RequestParam(name = "synopsis", required = false) String synopsis,
+                                @RequestParam(name = "kindsId", required = false) BigInteger kindsId,
+                                @RequestParam(name = "tags", required = false) String tags) {
 //        if (BaseUtils.isEmpty(loginUser)) {
 //            return new Response(1003);
 //        }
-        if (BaseUtils.isEmpty(title) || BaseUtils.isEmpty(images) || BaseUtils.isEmpty(author) || BaseUtils.isEmpty(synopsis) || BaseUtils.isEmpty(kindsId)) {
+        if (BaseUtils.isEmpty(novelId)) {
             return new Response<>(1002);
         }
         BigInteger result = null;

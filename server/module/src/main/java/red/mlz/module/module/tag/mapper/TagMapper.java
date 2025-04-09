@@ -23,9 +23,9 @@ public interface TagMapper {
     @Select("select id from tag where tag_name = #{tagName} and is_deleted = 0")
     int getTagIdByTagName(@Param("tagName") String tagName);
 
-    BigInteger insert(@Param("tag") Tag tag);
+    int insert(@Param("tag") Tag tag);
 
-    BigInteger update(@Param("tag") Tag tag);
+    int update(@Param("tag") Tag tag);
 
     @Update("update tag set is_deleted = 1,update_time=#{time} where id = #{id} limit 1")
     int delete(@Param("id") BigInteger id, @Param("time") Integer time);

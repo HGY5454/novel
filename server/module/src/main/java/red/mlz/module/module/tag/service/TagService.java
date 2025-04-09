@@ -31,7 +31,7 @@ public class TagService {
         return tagMapper.getTagIdByTagName(tagName);
     }
 
-    public BigInteger edit( Tag tag) {
+    public int edit( Tag tag) {
         if (tag.getId() == null) {
             return tagMapper.insert(tag);
         } else {

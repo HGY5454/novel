@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NovelService {
@@ -98,7 +99,7 @@ public class NovelService {
                 newTag.setCreateTime(timestamp);
                 newTag.setUpdateTime(timestamp);
                 newTag.setIsDeleted(0);
-                tagIds.add(tagService.edit(newTag));
+                tagIds.add(BigInteger.valueOf(tagService.edit(newTag)));
             } else {
                 tagIds.add(existingTag.getId());
             }
@@ -122,29 +123,38 @@ public class NovelService {
             for (NovelTagRelation novelTagRelation : novelTagRelationList) {
                 originalTagIds.add(novelTagRelation.getTagId());
             }
-            List<BigInteger> updatedTagIds = new ArrayList<>(tagIds);
-            updatedTagIds.retainAll(originalTagIds);
-            List<BigInteger> deleteTagIds = new ArrayList<>(originalTagIds);
-            deleteTagIds.removeAll(updatedTagIds);
-            List<BigInteger> createTagIds = new ArrayList<>(tagIds);
-            createTagIds.removeAll(updatedTagIds);
 
-            for (BigInteger tagId : deleteTagIds) {
-                novelTagRelationService.delete(tagId);
+            List<BigInteger> updateTagIds= originalTagIds.stream()
+                    .filter(e -> tagIds.contains(e))
+                    .collect(Collectors.toList());
+
+            List<BigInteger> deleteTagIds = new ArrayList<>(originalTagIds);
+            deleteTagIds.removeAll(updateTagIds);
+            List<BigInteger> createTagIds = new ArrayList<>(tagIds);
+            createTagIds.removeAll(updateTagIds);
+
+            if (deleteTagIds.size() > 0) {
+                for (BigInteger tagId : deleteTagIds) {
+                    novelTagRelationService.DeleteByTagId(tagId,novelId);
+                }
             }
-            for (BigInteger tagId : createTagIds) {
-                NovelTagRelation novelTagRelation = new NovelTagRelation();
-                novelTagRelation.setNovelId(novelId);
-                novelTagRelation.setTagId(tagId);
-                novelTagRelation.setCreateTime(timestamp);
-                novelTagRelation.setUpdateTime(timestamp);
-                novelTagRelation.setIsDeleted(0);
-                novelTagRelationService.edit(novelTagRelation);
+            if (createTagIds.size() > 0) {
+                for (BigInteger tagId : createTagIds) {
+                    NovelTagRelation novelTagRelation = new NovelTagRelation();
+                    novelTagRelation.setNovelId(novelId);
+                    novelTagRelation.setTagId(tagId);
+                    novelTagRelation.setCreateTime(timestamp);
+                    novelTagRelation.setUpdateTime(timestamp);
+                    novelTagRelation.setIsDeleted(0);
+                    novelTagRelationService.edit(novelTagRelation);
+                }
             }
-            for (BigInteger tagId : updatedTagIds) {
-                NovelTagRelation novelTagRelation = novelTagRelationService.SelectByNovelIdAndTagId(novelId, tagId);
-                novelTagRelation.setUpdateTime(timestamp);
-                novelTagRelationService.edit(novelTagRelation);
+            if (updateTagIds.size() > 0) {
+                for (BigInteger tagId : updateTagIds) {
+                    NovelTagRelation novelTagRelation = novelTagRelationService.SelectByNovelIdAndTagId(novelId, tagId);
+                    novelTagRelation.setUpdateTime(timestamp);
+                    novelTagRelationService.edit(novelTagRelation);
+                }
             }
 
         } catch (Exception e) {
