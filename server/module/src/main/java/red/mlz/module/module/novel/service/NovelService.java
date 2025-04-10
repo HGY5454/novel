@@ -3,6 +3,7 @@ package red.mlz.module.module.novel.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.mapper.NovelMapper;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
 import red.mlz.module.module.tag.entity.Tag;
 import red.mlz.module.module.tag.service.TagService;
 import red.mlz.module.utils.BaseUtils;
+import red.mlz.module.utils.Response;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -26,6 +28,8 @@ public class NovelService {
     TagService tagService = new TagService();
     @Autowired
     NovelTagRelationService novelTagRelationService = new NovelTagRelationService();
+    @Autowired
+    KindsService kindsService = new KindsService();
 
     public Novel getById(BigInteger id) {
         return mapper.getById(id);
@@ -80,6 +84,9 @@ public class NovelService {
         }
         if (synopsis == null || synopsis.length() > 50) {
             throw new RuntimeException("synopsis长度应在0~50之间");
+        }
+        if (kindsService.getKindsById(kindsId) != null){
+            throw new RuntimeException("分类不存在");
         }
         novel.setTitle(title);
         novel.setImagesUrl(images);

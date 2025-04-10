@@ -92,17 +92,14 @@ public class NovelController {
         if (BaseUtils.isEmpty(title) || BaseUtils.isEmpty(images) || BaseUtils.isEmpty(author) | BaseUtils.isEmpty(synopsis) || BaseUtils.isEmpty(kindsId)) {
             return new Response<>(1002);
         }
-        if (kindsService.getKindsById(kindsId) != null) {
-            BigInteger result = null;
-            try {
-                result = novelService.editNovel(null, title.trim(), images.trim(), author.trim(), score, wordCount, synopsis.trim(), kindsId, tags);
-            } catch (Exception e) {
-                log.info("系统异常");
-            }
-            return new Response<>(1001, "novelId=" + result);
-        } else {
-            return new Response<>(3053);
+
+        BigInteger result = null;
+        try {
+            result = novelService.editNovel(null, title.trim(), images.trim(), author.trim(), score, wordCount, synopsis.trim(), kindsId, tags);
+        } catch (Exception e) {
+            log.info("系统异常");
         }
+        return new Response<>(1001, "novelId=" + result);
     }
 
     @RequestMapping("/novel/update")
