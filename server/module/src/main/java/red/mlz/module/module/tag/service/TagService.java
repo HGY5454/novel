@@ -33,10 +33,17 @@ public class TagService {
 
     public int edit( Tag tag) {
         if (tag.getId() == null) {
-            return tagMapper.insert(tag);
+            return insert(tag);
         } else {
-            return tagMapper.update(tag);
+            return update(tag);
         }
+    }
+    public int insert(Tag tag) {
+        return tagMapper.insert(tag);
+    }
+
+    public int update(Tag tag) {
+        return tagMapper.update(tag);
     }
 
     public int delete(BigInteger id) {
