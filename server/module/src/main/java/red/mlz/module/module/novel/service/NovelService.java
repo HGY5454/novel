@@ -22,11 +22,11 @@ public class NovelService {
     @Resource
     private NovelMapper mapper;
     @Autowired
-    private TagService tagService = new TagService();
+    private TagService tagService;
     @Autowired
-    private NovelTagRelationService novelTagRelationService = new NovelTagRelationService();
+    private NovelTagRelationService novelTagRelationService;
     @Autowired
-    private KindsService kindsService = new KindsService();
+    private KindsService kindsService;
 
     public Novel getById(BigInteger id) {
         return mapper.getById(id);

@@ -38,13 +38,13 @@ public class TagService {
     public int edit( Tag tag) {
         Tag newTag = new Tag();
         newTag.setTagName(tag.getTagName());
-        newTag.setUpdateTime(BaseUtils.currentSeconds());
         if (tag.getId() == null) {
+            newTag.setUpdateTime(BaseUtils.currentSeconds());
             newTag.setCreateTime(BaseUtils.currentSeconds());
             newTag.setIsDeleted(0);
             return insert(tag);
         } else {
-            newTag.setNovelId(tag.getNovelId)
+            newTag.setUpdateTime(BaseUtils.currentSeconds());
             return update(tag);
         }
     }
