@@ -1,7 +1,6 @@
 package red.mlz.module.module.novel.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
@@ -11,8 +10,6 @@ import red.mlz.module.module.novelTagRelation.entity.NovelTagRelation;
 import red.mlz.module.module.novelTagRelation.service.NovelTagRelationService;
 import red.mlz.module.module.tag.entity.Tag;
 import red.mlz.module.module.tag.service.TagService;
-import red.mlz.module.utils.BaseUtils;
-import red.mlz.module.utils.Response;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -25,11 +22,11 @@ public class NovelService {
     @Resource
     private NovelMapper mapper;
     @Autowired
-    TagService tagService = new TagService();
+    private TagService tagService = new TagService();
     @Autowired
-    NovelTagRelationService novelTagRelationService = new NovelTagRelationService();
+    private NovelTagRelationService novelTagRelationService = new NovelTagRelationService();
     @Autowired
-    KindsService kindsService = new KindsService();
+    private KindsService kindsService = new KindsService();
 
     public Novel getById(BigInteger id) {
         return mapper.getById(id);
@@ -125,7 +122,7 @@ public class NovelService {
             novelId = novel.getId();
         }
         try {
-            List<NovelTagRelation> novelTagRelationList = novelTagRelationService.SelectByNovelId(novelId);
+            List<NovelTagRelation> novelTagRelationList = novelTagRelationService.selectByNovelId(novelId);
             List<BigInteger> originalTagIds = new ArrayList<>();
             for (NovelTagRelation novelTagRelation : novelTagRelationList) {
                 originalTagIds.add(novelTagRelation.getTagId());
@@ -142,7 +139,7 @@ public class NovelService {
 
             if (deleteTagIds.size() > 0) {
                 for (BigInteger tagId : deleteTagIds) {
-                    novelTagRelationService.DeleteByTagId(tagId,novelId);
+                    novelTagRelationService.deleteByTagId(tagId,novelId);
                 }
             }
             if (createTagIds.size() > 0) {
@@ -158,7 +155,7 @@ public class NovelService {
             }
             if (updateTagIds.size() > 0) {
                 for (BigInteger tagId : updateTagIds) {
-                    NovelTagRelation novelTagRelation = novelTagRelationService.SelectByNovelIdAndTagId(novelId, tagId);
+                    NovelTagRelation novelTagRelation = novelTagRelationService.selectByNovelIdAndTagId(novelId, tagId);
                     novelTagRelation.setUpdateTime(timestamp);
                     novelTagRelationService.edit(novelTagRelation);
                 }
