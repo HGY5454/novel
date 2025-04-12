@@ -1,6 +1,5 @@
 package red.mlz.module.module.tag.service;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.tag.entity.Tag;
@@ -16,12 +15,8 @@ public class TagService {
     @Resource
     private TagMapper tagMapper;
 
-    public Tag extractById(BigInteger id) {
-        return tagMapper.extractById(id);
-    }
-
-    public Tag extractByTagName(String tagName) {
-        return tagMapper.extractByTagName(tagName);
+    public Tag getTagByTagName(String tagName) {
+        return tagMapper.getTagByTagName(tagName);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -35,16 +30,29 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    public Tag extractById(BigInteger id) {
+        return tagMapper.extract(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Tag getById(BigInteger id) {
+        return tagMapper.getById(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public int edit( Tag tag) {
         Tag newTag = new Tag();
         newTag.setTagName(tag.getTagName());
+        newTag.setUpdateTime(BaseUtils.currentSeconds());
+        newTag.setIsDeleted(0);
         if (tag.getId() == null) {
-            newTag.setUpdateTime(BaseUtils.currentSeconds());
             newTag.setCreateTime(BaseUtils.currentSeconds());
-            newTag.setIsDeleted(0);
             return insert(tag);
         } else {
-            newTag.setUpdateTime(BaseUtils.currentSeconds());
+            if (getById(tag.getId()) == null) {
+                throw new RuntimeException("系统异常");
+            }
+            newTag.setId(tag.getId());
             return update(tag);
         }
     }

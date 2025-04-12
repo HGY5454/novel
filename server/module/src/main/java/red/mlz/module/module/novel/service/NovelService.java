@@ -96,7 +96,7 @@ public class NovelService {
 
         List<BigInteger> tagIds = new ArrayList<>();
         for (String tagName : tags.split(",")) {
-            Tag existingTag = tagService.extractByTagName(tagName);
+            Tag existingTag = tagService.getTagByTagName(tagName);
             if (existingTag == null) {
                 Tag newTag = new Tag();
                 newTag.setTagName(tagName.trim());
