@@ -103,7 +103,7 @@ public class NovelService {
                 newTag.setCreateTime(timestamp);
                 newTag.setUpdateTime(timestamp);
                 newTag.setIsDeleted(0);
-                tagIds.add(BigInteger.valueOf(tagService.edit(newTag)));
+                tagIds.add(tagService.edit(newTag));
             } else {
                 tagIds.add(existingTag.getId());
             }

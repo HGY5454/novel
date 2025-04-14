@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface TagMapper {
     @Select("select * from tag where  id = #{id}")
-    Tag extract(@Param("id") BigInteger id);
+    Tag extractById(@Param("id") BigInteger id);
 
     int insert(@Param("tag") Tag tag);
 
@@ -31,6 +31,4 @@ public interface TagMapper {
     @Select("select * from tag")
     List<Tag> getAllTags();
 
-    @Select("select id from tag where tag_name = #{tagName} and is_deleted = 0")
-    int getTagIdByTagName(@Param("tagName") String tagName);
 }

@@ -20,21 +20,19 @@ public class NovelTagRelationService {
         return novelTagRelationMapper.delete(id, BaseUtils.currentSeconds());
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public NovelTagRelation extract(BigInteger id) {
-        return novelTagRelationMapper.extract(id);
+        return novelTagRelationMapper.extractById(id);
     }
-    @Transactional(rollbackFor = Exception.class)
     public NovelTagRelation selectByNovelIdAndTagId(BigInteger novelId, BigInteger tagId) {
         return novelTagRelationMapper.selectByNovelIdAndTagsId(novelId, tagId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public NovelTagRelation getById(BigInteger id) {
         return novelTagRelationMapper.getById(id);
     }
+
     @Transactional(rollbackFor = Exception.class)
-    public int edit(NovelTagRelation novelTagRelation) {
+    public BigInteger edit(NovelTagRelation novelTagRelation) {
         NovelTagRelation newNovelTagRelation = new NovelTagRelation();
         newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
         newNovelTagRelation.setTagId(novelTagRelation.getTagId());
@@ -42,18 +40,25 @@ public class NovelTagRelationService {
         newNovelTagRelation.setIsDeleted(0);
         if (novelTagRelation.getId() == null) {
             newNovelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-            return novelTagRelationMapper.insert(novelTagRelation);
+            return insert(novelTagRelation);
         }else {
             if (getById(novelTagRelation.getId()) == null) {
                 throw new RuntimeException("系统异常");
             }
             newNovelTagRelation.setId(novelTagRelation.getId());
             newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-            return novelTagRelationMapper.update(novelTagRelation);
+            return update(novelTagRelation);
         }
     }
+    public BigInteger insert(NovelTagRelation novelTagRelation) {
+        novelTagRelationMapper.insert(novelTagRelation);
+        return novelTagRelation.getId();
+    }
+    public BigInteger update(NovelTagRelation novelTagRelation) {
+        novelTagRelationMapper.update(novelTagRelation);
+        return novelTagRelation.getId();
+    }
 
-    @Transactional(rollbackFor = Exception.class)
     public List<NovelTagRelation> selectByNovelId(BigInteger novelId) {
         return novelTagRelationMapper.selectByNovelId(novelId);
     }

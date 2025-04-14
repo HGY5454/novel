@@ -13,7 +13,7 @@ import java.util.List;
 public interface NovelTagRelationMapper {
 
     @Select("select * from novel_tag_relation where  id = #{id} ")
-    NovelTagRelation extract(@Param("novelId") BigInteger id);
+    NovelTagRelation extractById(@Param("novelId") BigInteger id);
 
     int insert(@Param("novelTagRelation") NovelTagRelation novelTagRelation);
 
