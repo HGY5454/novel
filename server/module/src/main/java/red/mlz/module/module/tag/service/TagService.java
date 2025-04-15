@@ -34,34 +34,34 @@ public class TagService {
     @Transactional(rollbackFor = Exception.class)
     public BigInteger edit( Tag tag) {
         Tag newTag = new Tag();
-        newTag.setTagName(tag.getTagName());
-        newTag.setUpdateTime(BaseUtils.currentSeconds());
-        newTag.setIsDeleted(0);
         if (tag.getId() == null) {
+            newTag.setTagName(tag.getTagName());
+            newTag.setUpdateTime(BaseUtils.currentSeconds());
+            newTag.setIsDeleted(0);
             newTag.setCreateTime(BaseUtils.currentSeconds());
-            return insert(tag);
+            return insert(newTag);
         } else {
             if (getById(tag.getId()) == null) {
                 throw new RuntimeException("系统异常");
             }
+            newTag.setTagName(tag.getTagName());
+            newTag.setUpdateTime(BaseUtils.currentSeconds());
+            newTag.setIsDeleted(0);
             newTag.setId(tag.getId());
-            return update(tag);
+            return update(newTag);
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public BigInteger insert(Tag tag) {
         tagMapper.insert(tag);
         return tag.getId();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public BigInteger update(Tag tag) {
         tagMapper.update(tag);
         return tag.getId();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger id) {
         return tagMapper.delete(id, BaseUtils.currentSeconds());
     }

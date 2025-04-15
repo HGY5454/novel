@@ -62,8 +62,6 @@ public class NovelService {
 
         int timestamp = (int) (System.currentTimeMillis() / 1000);
 
-        Novel novel = new Novel();
-
         if (title == null || title.length() > 50) {
             throw new RuntimeException("title长度应在0~50之间");
         }
@@ -85,6 +83,8 @@ public class NovelService {
         if (kindsService.getKindsById(kindsId) != null){
             throw new RuntimeException("分类不存在");
         }
+
+        Novel novel = new Novel();
         novel.setTitle(title);
         novel.setImagesUrl(images);
         novel.setAuthor(author);
@@ -93,6 +93,19 @@ public class NovelService {
         novel.setSynopsis(synopsis);
         novel.setKindsId(kindsId);
         novel.setUpdateTime(timestamp);
+
+        if (novelId != null) {
+            if (getById(novelId) == null) {
+                throw new RuntimeException("系统异常");
+            }
+            novel.setId(novelId);
+            update(novel);
+        } else {
+            novel.setCreateTime(timestamp);
+            novel.setIsDeleted(0);
+            insert(novel);
+            novelId = novel.getId();
+        }
 
         List<BigInteger> tagIds = new ArrayList<>();
         for (String tagName : tags.split(",")) {
@@ -109,18 +122,7 @@ public class NovelService {
             }
         }
 
-        if (novelId != null) {
-            if (getById(novelId) == null) {
-                throw new RuntimeException("系统异常");
-            }
-            novel.setId(novelId);
-            update(novel);
-        } else {
-            novel.setCreateTime(timestamp);
-            novel.setIsDeleted(0);
-            insert(novel);
-            novelId = novel.getId();
-        }
+
         try {
             List<NovelTagRelation> novelTagRelationList = novelTagRelationService.selectByNovelId(novelId);
             List<BigInteger> originalTagIds = new ArrayList<>();

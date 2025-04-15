@@ -34,20 +34,23 @@ public class NovelTagRelationService {
     @Transactional(rollbackFor = Exception.class)
     public BigInteger edit(NovelTagRelation novelTagRelation) {
         NovelTagRelation newNovelTagRelation = new NovelTagRelation();
-        newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
-        newNovelTagRelation.setTagId(novelTagRelation.getTagId());
-        newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-        newNovelTagRelation.setIsDeleted(0);
         if (novelTagRelation.getId() == null) {
+            newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
+            newNovelTagRelation.setTagId(novelTagRelation.getTagId());
             newNovelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-            return insert(novelTagRelation);
+            newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
+            newNovelTagRelation.setIsDeleted(0);
+            return insert(newNovelTagRelation);
         }else {
             if (getById(novelTagRelation.getId()) == null) {
                 throw new RuntimeException("系统异常");
             }
             newNovelTagRelation.setId(novelTagRelation.getId());
+            newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
+            newNovelTagRelation.setTagId(novelTagRelation.getTagId());
             newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-            return update(novelTagRelation);
+            newNovelTagRelation.setIsDeleted(0);
+            return update(newNovelTagRelation);
         }
     }
     public BigInteger insert(NovelTagRelation novelTagRelation) {
@@ -63,7 +66,6 @@ public class NovelTagRelationService {
         return novelTagRelationMapper.selectByNovelId(novelId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public int deleteByTagId(BigInteger tagId, BigInteger novelId) {
         return novelTagRelationMapper.deleteByTagId(tagId,novelId, BaseUtils.currentSeconds());
     }
