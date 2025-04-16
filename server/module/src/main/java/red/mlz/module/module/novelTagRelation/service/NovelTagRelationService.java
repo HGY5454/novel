@@ -15,7 +15,6 @@ public class NovelTagRelationService {
     @Resource
     private NovelTagRelationMapper novelTagRelationMapper;
 
-    @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger id) {
         return novelTagRelationMapper.delete(id, BaseUtils.currentSeconds());
     }
