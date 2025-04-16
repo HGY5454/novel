@@ -31,7 +31,6 @@ public class NovelTagRelationService {
         return novelTagRelationMapper.getById(id);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public BigInteger edit(NovelTagRelation novelTagRelation) {
         NovelTagRelation newNovelTagRelation = new NovelTagRelation();
         if (novelTagRelation.getId() == null) {
