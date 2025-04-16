@@ -31,6 +31,7 @@ public class TagService {
         return tagMapper.getById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger edit( Tag tag) {
         Tag newTag = new Tag();
         if (tag.getId() == null) {
@@ -51,16 +52,17 @@ public class TagService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger insert(Tag tag) {
         tagMapper.insert(tag);
         return tag.getId();
     }
-
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger update(Tag tag) {
         tagMapper.update(tag);
         return tag.getId();
     }
-
+    @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger id) {
         return tagMapper.delete(id, BaseUtils.currentSeconds());
     }

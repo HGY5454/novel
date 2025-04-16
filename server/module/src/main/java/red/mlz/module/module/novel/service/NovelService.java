@@ -80,7 +80,7 @@ public class NovelService {
         if (synopsis == null || synopsis.length() > 50) {
             throw new RuntimeException("synopsis长度应在0~50之间");
         }
-        if (kindsService.getKindsById(kindsId) != null){
+        if (kindsService.getKindsById(kindsId) == null){
             throw new RuntimeException("分类不存在");
         }
 
@@ -169,18 +169,22 @@ public class NovelService {
         return novel.getId();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int update(Novel novel) {
         return mapper.update(novel);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int insert(Novel novel) {
         return mapper.insert(novel);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger novelId) {
         return mapper.delete(novelId, (int) (System.currentTimeMillis() / 1000));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public int updateInfo(BigInteger id, String info) {
         return mapper.updateInfo(id, info);
     }

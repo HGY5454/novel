@@ -15,6 +15,7 @@ public class NovelTagRelationService {
     @Resource
     private NovelTagRelationMapper novelTagRelationMapper;
 
+    @Transactional(rollbackFor = Exception.class)
     public int delete(BigInteger id) {
         return novelTagRelationMapper.delete(id, BaseUtils.currentSeconds());
     }
@@ -30,6 +31,7 @@ public class NovelTagRelationService {
         return novelTagRelationMapper.getById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger edit(NovelTagRelation novelTagRelation) {
         NovelTagRelation newNovelTagRelation = new NovelTagRelation();
         if (novelTagRelation.getId() == null) {
@@ -51,10 +53,14 @@ public class NovelTagRelationService {
             return update(newNovelTagRelation);
         }
     }
+
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger insert(NovelTagRelation novelTagRelation) {
         novelTagRelationMapper.insert(novelTagRelation);
         return novelTagRelation.getId();
     }
+
+    @Transactional(rollbackFor = Exception.class)
     public BigInteger update(NovelTagRelation novelTagRelation) {
         novelTagRelationMapper.update(novelTagRelation);
         return novelTagRelation.getId();
@@ -64,6 +70,8 @@ public class NovelTagRelationService {
         return novelTagRelationMapper.selectByNovelId(novelId);
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
     public int deleteByTagId(BigInteger tagId, BigInteger novelId) {
         return novelTagRelationMapper.deleteByTagId(tagId,novelId, BaseUtils.currentSeconds());
     }
