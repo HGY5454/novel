@@ -31,7 +31,6 @@ public class TagService {
         return tagMapper.getById(id);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public BigInteger edit( Tag tag) {
         Tag newTag = new Tag();
         if (tag.getId() == null) {
