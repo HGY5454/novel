@@ -111,17 +111,11 @@ public class NovelService {
         for (String tagName : tags.split(",")) {
             Tag existingTag = tagService.getTagByTagName(tagName);
             if (existingTag == null) {
-                Tag newTag = new Tag();
-                newTag.setTagName(tagName.trim());
-                newTag.setCreateTime(timestamp);
-                newTag.setUpdateTime(timestamp);
-                newTag.setIsDeleted(0);
-                tagIds.add(tagService.edit(newTag.getId(), newTag.getTagName()));
+                tagIds.add(tagService.edit(null,tagName));
             } else {
                 tagIds.add(existingTag.getId());
             }
         }
-
 
         try {
             List<NovelTagRelation> novelTagRelationList = novelTagRelationService.selectByNovelId(novelId);
