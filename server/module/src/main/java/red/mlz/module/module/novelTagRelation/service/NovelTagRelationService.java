@@ -32,24 +32,20 @@ public class NovelTagRelationService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public BigInteger edit(NovelTagRelation novelTagRelation) {
+    public BigInteger edit(BigInteger novelTagRelationId, BigInteger tagId,BigInteger novelId) {
         NovelTagRelation newNovelTagRelation = new NovelTagRelation();
-        if (novelTagRelation.getId() == null) {
-            newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
-            newNovelTagRelation.setTagId(novelTagRelation.getTagId());
+        newNovelTagRelation.setNovelId(novelId);
+        newNovelTagRelation.setTagId(tagId);
+        newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
+        newNovelTagRelation.setIsDeleted(0);
+        if (novelTagRelationId == null) {
             newNovelTagRelation.setCreateTime(BaseUtils.currentSeconds());
-            newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-            newNovelTagRelation.setIsDeleted(0);
             return insert(newNovelTagRelation);
         }else {
-            if (getById(novelTagRelation.getId()) == null) {
+            if (getById(novelTagRelationId) == null) {
                 throw new RuntimeException("系统异常");
             }
-            newNovelTagRelation.setId(novelTagRelation.getId());
-            newNovelTagRelation.setNovelId(novelTagRelation.getNovelId());
-            newNovelTagRelation.setTagId(novelTagRelation.getTagId());
-            newNovelTagRelation.setUpdateTime(BaseUtils.currentSeconds());
-            newNovelTagRelation.setIsDeleted(0);
+            newNovelTagRelation.setId(novelTagRelationId);
             return update(newNovelTagRelation);
         }
     }

@@ -32,22 +32,19 @@ public class TagService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public BigInteger edit( Tag tag) {
+    public BigInteger edit(BigInteger id,String tagName) {
         Tag newTag = new Tag();
-        if (tag.getId() == null) {
-            newTag.setTagName(tag.getTagName());
-            newTag.setUpdateTime(BaseUtils.currentSeconds());
-            newTag.setIsDeleted(0);
+        newTag.setTagName(tagName);
+        newTag.setIsDeleted(0);
+        newTag.setUpdateTime(BaseUtils.currentSeconds());
+        if (id == null) {
             newTag.setCreateTime(BaseUtils.currentSeconds());
             return insert(newTag);
         } else {
-            if (getById(tag.getId()) == null) {
+            if (id == null) {
                 throw new RuntimeException("系统异常");
             }
-            newTag.setTagName(tag.getTagName());
-            newTag.setUpdateTime(BaseUtils.currentSeconds());
-            newTag.setIsDeleted(0);
-            newTag.setId(tag.getId());
+            newTag.setId(id);
             return update(newTag);
         }
     }

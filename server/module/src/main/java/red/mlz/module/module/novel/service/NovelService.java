@@ -116,7 +116,7 @@ public class NovelService {
                 newTag.setCreateTime(timestamp);
                 newTag.setUpdateTime(timestamp);
                 newTag.setIsDeleted(0);
-                tagIds.add(tagService.edit(newTag));
+                tagIds.add(tagService.edit(newTag.getId(), newTag.getTagName()));
             } else {
                 tagIds.add(existingTag.getId());
             }
@@ -146,20 +146,14 @@ public class NovelService {
             }
             if (createTagIds.size() > 0) {
                 for (BigInteger tagId : createTagIds) {
-                    NovelTagRelation novelTagRelation = new NovelTagRelation();
-                    novelTagRelation.setNovelId(novelId);
-                    novelTagRelation.setTagId(tagId);
-                    novelTagRelation.setCreateTime(timestamp);
-                    novelTagRelation.setUpdateTime(timestamp);
-                    novelTagRelation.setIsDeleted(0);
-                    novelTagRelationService.edit(novelTagRelation);
+                    BigInteger id = null;
+                    novelTagRelationService.edit(id,novelId,tagId);
                 }
             }
             if (updateTagIds.size() > 0) {
                 for (BigInteger tagId : updateTagIds) {
                     NovelTagRelation novelTagRelation = novelTagRelationService.selectByNovelIdAndTagId(novelId, tagId);
-                    novelTagRelation.setUpdateTime(timestamp);
-                    novelTagRelationService.edit(novelTagRelation);
+                    novelTagRelationService.edit(novelTagRelation.getId(),novelId,tagId);
                 }
             }
 
