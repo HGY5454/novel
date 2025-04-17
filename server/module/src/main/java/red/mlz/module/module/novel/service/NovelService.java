@@ -124,14 +124,14 @@ public class NovelService {
                 originalTagIds.add(novelTagRelation.getTagId());
             }
 
-            List<BigInteger> updateTagIds= originalTagIds.stream()
+            List<BigInteger> retainTagIds= originalTagIds.stream()
                     .filter(e -> tagIds.contains(e))
                     .collect(Collectors.toList());
 
             List<BigInteger> deleteTagIds = new ArrayList<>(originalTagIds);
-            deleteTagIds.removeAll(updateTagIds);
+            deleteTagIds.removeAll(retainTagIds);
             List<BigInteger> createTagIds = new ArrayList<>(tagIds);
-            createTagIds.removeAll(updateTagIds);
+            createTagIds.removeAll(retainTagIds);
 
             if (deleteTagIds.size() > 0) {
                 for (BigInteger tagId : deleteTagIds) {
@@ -140,14 +140,7 @@ public class NovelService {
             }
             if (createTagIds.size() > 0) {
                 for (BigInteger tagId : createTagIds) {
-                    BigInteger id = null;
-                    novelTagRelationService.edit(id,novelId,tagId);
-                }
-            }
-            if (updateTagIds.size() > 0) {
-                for (BigInteger tagId : updateTagIds) {
-                    NovelTagRelation novelTagRelation = novelTagRelationService.selectByNovelIdAndTagId(novelId, tagId);
-                    novelTagRelationService.edit(novelTagRelation.getId(),novelId,tagId);
+                    novelTagRelationService.edit(null,novelId,tagId);
                 }
             }
 
