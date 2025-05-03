@@ -1,29 +1,35 @@
-//package red.mlz.crond.controller;
-//
-//@Component
-//public class SmsSendTask {
-//
-//    @Autowired
-//    private SmsTaskMapper smsTaskMapper;
-//    @Autowired
-//    private SmsService smsService;
-//
-//    @Scheduled(cron = "0 */5 * * * ?") // 每5分钟执行一次
-//    public void execute() {
-//        // 查询所有新任务
-//        List<SmsTask> tasks = smsTaskMapper.selectByStatus(0);
-//
-//        for (SmsTask task : tasks) {
-//            try {
-//                // 发送短信
-//                SmsRecord record = smsService.sendSms(task.getPhone(), task.getContent(), task.getTemplateCode());
-//
-//                // 更新任务状态
-//                smsTaskMapper.updateStatus(task.getId(), record.getStatus(),
-//                        record.getErrorMsg(), record.getBizId());
-//            } catch (Exception e) {
-//                smsTaskMapper.updateStatus(task.getId(), 2, e.getMessage(), null);
-//            }
-//        }
-//    }
-//}
+package red.mlz.crond.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import org.springframework.web.bind.annotation.RestController;
+import red.mlz.module.module.sms.entity.SmsTask;
+import red.mlz.module.module.sms.service.SmsRecordService;
+import red.mlz.module.module.sms.service.SmsTaskService;
+
+import java.util.List;
+
+
+@RestController
+public class SmsSendTask {
+    @Autowired
+    private SmsTaskService smsTaskService;
+    @Autowired
+    private SmsRecordService smsRecordService;
+    @Scheduled(fixedRate = 60000) // 每分钟执行
+    public void processTasks() throws Exception {
+        List<SmsTask> smsTask = smsTaskService.getListSmsTask();
+        for (SmsTask task : smsTask) {
+            if (task.getStatus() == 0) {
+                if (SmsSender.sendSms(task.getPhone()).getBody().getCode() == "ok" ){
+                    smsTaskService.updateSmsTask(task.getId(),task.getPhone(),1);
+                    smsRecordService.insertSmsRecord(task.getPhone(),1);
+                }else {
+                    smsRecordService.insertSmsRecord(task.getPhone(),2);
+                }
+
+            }
+        }
+    }
+}
