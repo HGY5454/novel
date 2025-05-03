@@ -1,11 +1,9 @@
-package red.mlz.app.crond;
+package red.mlz.app.controller.novel;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
-import red.mlz.app.domain.novel.Image;
-import red.mlz.app.domain.novel.ListVo;
-import red.mlz.app.domain.novel.NovelListVo;
+import red.mlz.app.domain.novel.*;
 import red.mlz.module.module.novel.entity.Novel;
 import red.mlz.module.module.novel.service.NovelService;
 
