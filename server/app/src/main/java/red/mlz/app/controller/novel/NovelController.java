@@ -4,6 +4,7 @@ package red.mlz.app.controller.novel;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import red.mlz.module.utils.Response;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +35,8 @@ public class NovelController {
     private KindsService kindsService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @RequestMapping("/novel/list")
     public Response novelList(@VerifiedUser User loginUser,
@@ -55,9 +59,6 @@ public class NovelController {
             }
             encodedString = BaseUtils.objectToString(localWp);
         }else {
-//            byte[] decoded = Base64.getUrlDecoder().decode(wp);
-//            String decodedString = new String(decoded, StandardCharsets.UTF_8);
-//            localWp = JSON.parseObject(decodedString, WpVo.class);
             localWp = BaseUtils.stringToObject(wp ,localWp);
             page = localWp.getPage() ;
             keyWord = localWp.getKeyword();
@@ -65,14 +66,29 @@ public class NovelController {
             encodedString = BaseUtils.objectToString(localWp);
         }
 
-        List<String> kindsIdList = novelService.getKindsIdByKeyword(keyWord);
+        String kindsCacheKey = "novel:kinds:" + keyWord;
+        List<String> kindsIdList = (List<String>) redisTemplate.opsForValue().get(kindsCacheKey);
+        if (kindsIdList == null || kindsIdList.isEmpty()) {
+            kindsIdList = novelService.getKindsIdByKeyword(keyWord);
+            redisTemplate.opsForValue().set(kindsCacheKey, kindsIdList, 30, TimeUnit.MINUTES);
+        }
         String ids = String.join(",", kindsIdList);
-        List<Novel> novelList = novelService.getNovelListByPage(page,pageSize,keyWord,ids);
 
+        String novelListCacheKey = String.format("novel:list:%s:%d:%d", keyWord, page, pageSize);
+        List<Novel> novelList = (List<Novel>) redisTemplate.opsForValue().get(novelListCacheKey);
+        if (novelList == null || novelList.isEmpty()) {
+            novelList = novelService.getNovelListByPage(page, pageSize, keyWord, ids);
+            redisTemplate.opsForValue().set(novelListCacheKey, novelList, 10, TimeUnit.MINUTES);
+        }
         NovelListVo novelListVo = new NovelListVo();
         novelListVo.setList(new ArrayList<>());
 
-        List<Kinds> kinds = kindsService.getKinds();
+        String allKindsCacheKey = "kinds:all";
+        List<Kinds> kinds = (List<Kinds>) redisTemplate.opsForValue().get(allKindsCacheKey);
+        if (kinds == null || kinds.isEmpty()) {
+            kinds = kindsService.getKinds();
+            redisTemplate.opsForValue().set(allKindsCacheKey, kinds, 1, TimeUnit.HOURS);
+        }
         HashMap<BigInteger,String> kindsHashMap = new HashMap<>();
 
         for (Kinds kind : kinds) {

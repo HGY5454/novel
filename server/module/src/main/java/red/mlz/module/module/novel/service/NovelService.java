@@ -1,6 +1,8 @@
 package red.mlz.module.module.novel.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
@@ -15,6 +17,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +51,7 @@ public class NovelService {
         return mapper.getKindsIdByKeyWord(keyword);
     }
 
+    @Cacheable(value = "novelList", key = "#page + '_' + #pageSize + '_' + #titleKeyWord + '_' + #ids")
     public List<Novel> getNovelListByPage(Integer page, Integer pageSize, String titleKeyWord, String ids) {
         Integer start = (page - 1) * pageSize;
         return mapper.getPage(titleKeyWord, start, pageSize, ids);
@@ -147,6 +151,7 @@ public class NovelService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        clearNovelCache(novel.getId().toString());
         return novel.getId();
     }
 
@@ -173,4 +178,20 @@ public class NovelService {
     public String getNovelInfo(BigInteger id) {
         return mapper.getInfo(id);
     }
+
+
+    private RedisTemplate<String, Object> redisTemplate;
+
+
+    public void clearNovelCache(String keyWord) {
+
+
+        redisTemplate.delete("novel:kindsIds:" + keyWord);
+        Set<String> keys = redisTemplate.keys("novel:list:" + keyWord + ":*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+
 }
