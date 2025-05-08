@@ -73,8 +73,7 @@ public class NovelController {
             redisTemplate.opsForValue().set(kindsCacheKey, kindsIdList, 30, TimeUnit.MINUTES);
         }
         String ids = String.join(",", kindsIdList);
-
-        String novelListCacheKey = String.format("novel:list:%s:%d:%d", keyWord, page, pageSize);
+        String novelListCacheKey = "novel:list:" + keyWord + page + pageSize;
         List<Novel> novelList = (List<Novel>) redisTemplate.opsForValue().get(novelListCacheKey);
         if (novelList == null || novelList.isEmpty()) {
             novelList = novelService.getNovelListByPage(page, pageSize, keyWord, ids);
@@ -83,17 +82,7 @@ public class NovelController {
         NovelListVo novelListVo = new NovelListVo();
         novelListVo.setList(new ArrayList<>());
 
-        String allKindsCacheKey = "kinds:all";
-        List<Kinds> kinds = (List<Kinds>) redisTemplate.opsForValue().get(allKindsCacheKey);
-        if (kinds == null || kinds.isEmpty()) {
-            kinds = kindsService.getKinds();
-            redisTemplate.opsForValue().set(allKindsCacheKey, kinds, 1, TimeUnit.HOURS);
-        }
-        HashMap<BigInteger,String> kindsHashMap = new HashMap<>();
 
-        for (Kinds kind : kinds) {
-            kindsHashMap.put(kind.getId(),kind.getKindsName());
-        }
 
         for (Novel novel : novelList) {
             ListVo listVo = new ListVo();
@@ -121,11 +110,14 @@ public class NovelController {
             listVo.setImage(image);
             listVo.setAuthor(novel.getAuthor());
 
-            if (kindsHashMap.get(novel.getKindsId()) != null) {
-                listVo.setKindsName(kindsHashMap.get(novel.getKindsId()));
-            }else {
-                continue;
+            String kindsIdCacheKey = "novel:kinds:" + novel.getKindsId();
+            String kindsName = (String) redisTemplate.opsForValue().get(kindsIdCacheKey);
+            if (kindsName == null || kindsName.isEmpty()) {
+                kindsName = kindsService.getKindsById(novel.getId()).getKindsName();
+                redisTemplate.opsForValue().set(kindsIdCacheKey, kindsName, 30, TimeUnit.MINUTES);
             }
+            listVo.setKindsName(kindsName);
+
             novelListVo.getList().add(listVo);
         }
         novelListVo.setWp(encodedString);
