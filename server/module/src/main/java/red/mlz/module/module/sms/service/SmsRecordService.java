@@ -39,7 +39,7 @@ public class SmsRecordService {
     return smsRecordMapper.insert(smsRecord);
     }
 
-    public int updateSmsRecord(Integer id , BigInteger phone, Integer status) {
+    public int updateSmsRecord(BigInteger id , BigInteger phone, Integer status) {
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         SmsRecord smsRecord = new SmsRecord();
         smsRecord.setId(id);

@@ -52,6 +52,17 @@ public class SmsTaskService {
         return smsTaskMapper.update(smsTask);
     }
 
+    public List<SmsTask> getUnSendSmsTask() {
+        List<SmsTask> smsTasks = getListSmsTask();
+        List<SmsTask> unSendSmsTasks = new ArrayList<>();
+        for (SmsTask smsTask : smsTasks) {
+            if (smsTask.getStatus() == 0) {
+                unSendSmsTasks.add(smsTask);
+            }
+        }
+        return unSendSmsTasks;
+    }
+
 
     public int deleteSmsTask( Integer id) {
     return smsTaskMapper.delete((int) (System.currentTimeMillis() / 1000),id);

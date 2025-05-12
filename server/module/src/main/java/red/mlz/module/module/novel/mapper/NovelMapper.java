@@ -41,10 +41,4 @@ public interface NovelMapper {
     @Update("update novel set is_deleted = 1,update_time=#{time} where id = #{id} limit 1")
     int delete(@Param("id")BigInteger id, @Param("time")Integer time);
 
-    @Select("select info from novel where id = #{id} and is_deleted = 0")
-    String getInfo(@Param("id")BigInteger id);
-
-    @Update("update novel set info = #{info} where id = #{id}")
-    int updateInfo(@Param("id")BigInteger id, @Param("info")String info);
-
 }

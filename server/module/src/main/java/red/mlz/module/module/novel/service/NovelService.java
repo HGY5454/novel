@@ -51,7 +51,6 @@ public class NovelService {
         return mapper.getKindsIdByKeyWord(keyword);
     }
 
-    @Cacheable(value = "novelList", key = "#page + '_' + #pageSize + '_' + #titleKeyWord + '_' + #ids")
     public List<Novel> getNovelListByPage(Integer page, Integer pageSize, String titleKeyWord, String ids) {
         Integer start = (page - 1) * pageSize;
         return mapper.getPage(titleKeyWord, start, pageSize, ids);
@@ -62,7 +61,7 @@ public class NovelService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public BigInteger editNovel(BigInteger novelId, String title, String images, String author, Float score, Integer worldCount, String synopsis, BigInteger kindsId, String tags) {
+    public BigInteger editNovel(BigInteger novelId, String title, String images, String author, Float score, Integer worldCount, String synopsis, BigInteger kindsId, String tags,String info) {
 
         int timestamp = (int) (System.currentTimeMillis() / 1000);
 
@@ -170,22 +169,9 @@ public class NovelService {
         return mapper.delete(novelId, (int) (System.currentTimeMillis() / 1000));
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public int updateInfo(BigInteger id, String info) {
-        return mapper.updateInfo(id, info);
-    }
-
-    public String getNovelInfo(BigInteger id) {
-        return mapper.getInfo(id);
-    }
-
-
     private RedisTemplate<String, Object> redisTemplate;
 
-
     public void clearNovelCache(String keyWord) {
-
-
         redisTemplate.delete("novel:kindsIds:" + keyWord);
         Set<String> keys = redisTemplate.keys("novel:list:" + keyWord + ":*");
         if (keys != null && !keys.isEmpty()) {
