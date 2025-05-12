@@ -43,8 +43,8 @@ public class NovelController {
 
     @RequestMapping("/novel/list")
     public Response novelList(@VerifiedUser User loginUser,
-                              @RequestParam(name="wp", required = false) String wp,
-                              @RequestParam(name= "keyWord", required = false, defaultValue ="%") String keyWord) {
+                              @RequestParam(name = "wp", required = false) String wp,
+                              @RequestParam(name = "keyWord", required = false, defaultValue = "%") String keyWord) {
         if (BaseUtils.isEmpty(loginUser)) {
             return new Response(1003);
         }
@@ -69,6 +69,14 @@ public class NovelController {
             encodedString = BaseUtils.objectToString(localWp);
         }
 
+        String novelListVoCacheKey = String.format("novel:listVo:%s:%d:%d", keyWord, page, pageSize);
+
+        NovelListVo cachedNovelListVo = (NovelListVo) redisTemplate.opsForValue().get(novelListVoCacheKey);
+        if (cachedNovelListVo != null) {
+            cachedNovelListVo.setWp(encodedString); // 更新 wp 信息
+            return new Response<>(1001, cachedNovelListVo);
+        }
+
         String kindsCacheKey = "novel:kinds:" + keyWord;
         String novelListCacheKey = String.format("novel:list:%s:%d:%d", keyWord, page, pageSize);
         String allKindsCacheKey = "kinds:all";
@@ -80,7 +88,6 @@ public class NovelController {
             connection.get(serializer.serialize(allKindsCacheKey));
             return null;
         });
-
 
         @SuppressWarnings("unchecked")
         List<String> kindsIdList = (List<String>) cacheResults.get(0);
@@ -101,7 +108,14 @@ public class NovelController {
         }
 
         if (kinds == null || kinds.isEmpty()) {
-            kinds = kindsService.getKinds();
+            LinkedHashSet<BigInteger> kindsIds = null;
+            for (Novel novel : novelList) {
+                kindsIds = new LinkedHashSet<>();
+                kindsIds.add(novel.getKindsId());
+            }
+            for (BigInteger kindsId : kindsIds){
+                kinds.add(kindsService.getKindsById(kindsId));
+            }
             redisTemplate.opsForValue().set(allKindsCacheKey, kinds, 1, TimeUnit.HOURS);
         }
 
@@ -137,8 +151,11 @@ public class NovelController {
         novelListVo.setWp(encodedString);
         novelListVo.setIsEnd(novelList.size() < pageSize);
 
+        redisTemplate.opsForValue().set(novelListVoCacheKey, novelListVo, 10, TimeUnit.MINUTES);
+
         return new Response<>(1001, novelListVo);
     }
+
 
 
 
