@@ -73,56 +73,20 @@ public class NovelController {
 
         NovelListVo cachedNovelListVo = (NovelListVo) redisTemplate.opsForValue().get(novelListVoCacheKey);
         if (cachedNovelListVo != null) {
-            cachedNovelListVo.setWp(encodedString); // 更新 wp 信息
+            cachedNovelListVo.setWp(encodedString);
             return new Response<>(1001, cachedNovelListVo);
         }
 
-        String kindsCacheKey = "novel:kinds:" + keyWord;
-        String novelListCacheKey = String.format("novel:list:%s:%d:%d", keyWord, page, pageSize);
-        String allKindsCacheKey = "kinds:all";
-
-        List<Object> cacheResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
-            connection.get(serializer.serialize(kindsCacheKey));
-            connection.get(serializer.serialize(novelListCacheKey));
-            connection.get(serializer.serialize(allKindsCacheKey));
-            return null;
-        });
-
-        @SuppressWarnings("unchecked")
-        List<String> kindsIdList = (List<String>) cacheResults.get(0);
-        @SuppressWarnings("unchecked")
-        List<Novel> novelList = (List<Novel>) cacheResults.get(1);
-        @SuppressWarnings("unchecked")
-        List<Kinds> kinds = (List<Kinds>) cacheResults.get(2);
-
-        if (kindsIdList == null || kindsIdList.isEmpty()) {
-            kindsIdList = novelService.getKindsIdByKeyword(keyWord);
-            redisTemplate.opsForValue().set(kindsCacheKey, kindsIdList, 30, TimeUnit.MINUTES);
-        }
-        String ids = String.join(",", kindsIdList);
-
-        if (novelList == null || novelList.isEmpty()) {
-            novelList = novelService.getNovelListByPage(page, pageSize, keyWord, ids);
-            redisTemplate.opsForValue().set(novelListCacheKey, novelList, 10, TimeUnit.MINUTES);
-        }
-
-        if (kinds == null || kinds.isEmpty()) {
-            LinkedHashSet<BigInteger> kindsIds = null;
-            for (Novel novel : novelList) {
-                kindsIds = new LinkedHashSet<>();
-                kindsIds.add(novel.getKindsId());
-            }
-            for (BigInteger kindsId : kindsIds){
-                kinds.add(kindsService.getKindsById(kindsId));
-            }
-            redisTemplate.opsForValue().set(allKindsCacheKey, kinds, 1, TimeUnit.HOURS);
+        List<Novel> novelList = novelService.getNovelListByPage(page, pageSize, keyWord, null);
+        List<Kinds> allKinds = new ArrayList<>();
+        for (Novel novel : novelList) {
+            allKinds.add(kindsService.getKindsById(novel.getKindsId()));
         }
 
         NovelListVo novelListVo = new NovelListVo();
         novelListVo.setList(new ArrayList<>());
 
-        Map<BigInteger, String> kindsHashMap = kinds.stream()
+        Map<BigInteger, String> kindsHashMap = allKinds.stream()
                 .collect(Collectors.toMap(Kinds::getId, Kinds::getKindsName));
 
         for (Novel novel : novelList) {
@@ -131,7 +95,6 @@ public class NovelController {
             listVo.setTitle(novel.getTitle());
             listVo.setInfo(JSON.parseArray(novel.getInfo(), InfoVo.class));
 
-            // 图片处理逻辑保持不变
             Image image = new Image();
             String imageUrl = novel.getImagesUrl().split("\\$")[0];
             Matcher matcher = Pattern.compile(".*?_(\\d+)x(\\d+)").matcher(imageUrl);
