@@ -1,13 +1,18 @@
 package red.mlz.module.module.kinds.service;
 
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import red.mlz.module.module.kinds.entity.Kinds;
 import red.mlz.module.module.kinds.mapper.KindsMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class KindsService {
@@ -66,8 +71,21 @@ public class KindsService {
         return kindsMapper.update(kinds);
     }
 
-
     public int deleteKinds(BigInteger id) {
         return kindsMapper.delete(id,(int) (System.currentTimeMillis() / 1000));
+    }
+
+    public Map<BigInteger, Kinds> getKindsMapByIds(List<BigInteger> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+
+        String idsStr = ids.stream()
+                .map(BigInteger::toString)
+                .collect(Collectors.joining(","));
+
+        return kindsMapper.selectKindsByIds(idsStr)
+                .stream()
+                .collect(Collectors.toMap(Kinds::getId, Function.identity()));
     }
 }
