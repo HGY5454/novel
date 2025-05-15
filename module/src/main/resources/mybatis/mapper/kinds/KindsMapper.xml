@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="red.mlz.module.module.kinds.mapper.KindsMapper">
+
+    <insert id="insert"
+            parameterType="red.mlz.module.module.kinds.entity.Kinds"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        insert into kinds
+        (
+        <if test="kinds.id !=null "> id,</if>
+
+        <if test="kinds.kindsName !=null "> kinds_name,</if>
+
+        <if test="kinds.kindsImage !=null "> kinds_image,</if>
+
+        <if test="kinds.createTime !=null "> create_time,</if>
+
+        <if test="kinds.updateTime !=null "> update_time,</if>
+
+        <if test="kinds.isDeleted !=null "> is_deleted</if>
+        )value(
+        <if test="kinds.id !=null "> #{kinds.id},</if>
+
+        <if test="kinds.kindsName !=null "> #{kinds.kindsName},</if>
+
+        <if test="kinds.kindsImage !=null "> #{kinds.kindsImage},</if>
+
+        <if test="kinds.createTime !=null "> #{kinds.createTime},</if>
+
+        <if test="kinds.updateTime !=null "> #{kinds.updateTime},</if>
+
+        <if test="kinds.isDeleted !=null "> #{kinds.isDeleted}</if>
+        )
+    </insert>
+    <update id="update"
+            parameterType="red.mlz.module.module.kinds.entity.Kinds"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        update kinds set
+        (
+        <if test="kinds.id !=null  and kinds.id !=''"> id=#{kinds.id},</if>
+
+        <if test="kinds.kindsName !=null  and kinds.kindsName !=''"> kinds_name=#{kinds.kindsName},</if>
+
+        <if test="kinds.kindsImage !=null  and kinds.kindsImage !=''"> kinds_image=#{kinds.kindsImage},</if>
+
+        <if test="kinds.createTime !=null  and kinds.createTime !=''"> create_time=#{kinds.createTime},</if>
+
+        <if test="kinds.updateTime !=null  and kinds.updateTime !=''"> update_time=#{kinds.updateTime},</if>
+
+        <if test="kinds.isDeleted !=null  and kinds.isDeleted !=''"> is_deleted=#{kinds.isDeleted}</if>
+        )
+        WHERE
+        id=#{kinds.id},
+    </update>
+
+    <select id="selectKindsByIds" resultType="com.example.model.Kinds">
+        SELECT * FROM kinds WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>
