@@ -78,16 +78,17 @@ public class NovelController {
         }
 
         List<Novel> novelList = novelService.getNovelListByPage(page, pageSize, keyWord, null);
-        List<Kinds> allKinds = new ArrayList<>();
-        for (Novel novel : novelList) {
-            allKinds.add(kindsService.getKindsById(novel.getKindsId()));
-        }
+
+        List<BigInteger> kindIds = novelList.stream()
+                .map(Novel::getKindsId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<BigInteger, Kinds> kindsMap = kindsService.getKindsMapByIds(kindIds);
 
         NovelListVo novelListVo = new NovelListVo();
         novelListVo.setList(new ArrayList<>());
-
-        Map<BigInteger, String> kindsHashMap = allKinds.stream()
-                .collect(Collectors.toMap(Kinds::getId, Kinds::getKindsName));
 
         for (Novel novel : novelList) {
             ListVo listVo = new ListVo();
@@ -105,8 +106,8 @@ public class NovelController {
             listVo.setImage(image);
 
             listVo.setAuthor(novel.getAuthor());
-            if (kindsHashMap.containsKey(novel.getKindsId())) {
-                listVo.setKindsName(kindsHashMap.get(novel.getKindsId()));
+            if (kindsMap.containsKey(novel.getKindsId())) {
+                listVo.setKindsName(kindsMap.get(novel.getKindsId()).getKindsName());
                 novelListVo.getList().add(listVo);
             }
         }
@@ -118,7 +119,6 @@ public class NovelController {
 
         return new Response<>(1001, novelListVo);
     }
-
 
 
 
