@@ -54,4 +54,12 @@
         WHERE
         id=#{kinds.id},
     </update>
+
+    <select id="selectKindsByIds"
+            parameterType="red.mlz.module.module.kinds.entity.Kinds">
+        select * from kinds where id
+            <if test="ids != null and ids != '' ">in (${ids})
+            </if>and
+        is_deleted = 0
+    </select>
 </mapper>

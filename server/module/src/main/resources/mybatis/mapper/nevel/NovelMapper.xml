@@ -36,7 +36,7 @@
         select * from novel where
         <if test="titleKeyWord != null and titleKeyWord != '' ">(title like concat('%',#{titleKeyWord},'%')
              <if test="ids != null and ids != '' ">or kinds_id in (${ids})
-            </if>)and
+            </if>and
         </if>
         is_deleted = 0 order by id  limit #{start},#{pageSize}
     </select>
@@ -63,4 +63,5 @@
                          <if test="novel.updateTime != null">,update_time = #{novel.updateTime}</if>
         where id = #{novel.id}
     </update>
+
 </mapper>

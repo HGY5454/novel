@@ -39,6 +39,6 @@ public interface KindsMapper {
         @Update("update kinds set is_deleted = 1,update_time=#{time} where id = #{id} limit 1")
         int delete(@Param("id") BigInteger id, @Param("time")Integer time);
 
-        @Select("SELECT * FROM kinds WHERE id IN (#{ids})")
         List<Kinds> selectKindsByIds(@Param("ids") String ids);
+
 }

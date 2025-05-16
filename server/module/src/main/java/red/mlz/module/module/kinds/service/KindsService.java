@@ -76,14 +76,9 @@ public class KindsService {
     }
 
     public Map<BigInteger, Kinds> getKindsMapByIds(List<BigInteger> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyMap();
-        }
-
         String idsStr = ids.stream()
                 .map(BigInteger::toString)
                 .collect(Collectors.joining(","));
-
         return kindsMapper.selectKindsByIds(idsStr)
                 .stream()
                 .collect(Collectors.toMap(Kinds::getId, Function.identity()));
