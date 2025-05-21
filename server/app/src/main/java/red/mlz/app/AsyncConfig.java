@@ -19,4 +19,14 @@ public class AsyncConfig {
         executor.setThreadNamePrefix("sms-sender-");
         return executor;
     }
+    @Bean("homePageTaskExecutor")
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(8);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("HomePage-Thread-");
+        executor.initialize();
+        return executor;
+    }
 }

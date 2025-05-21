@@ -42,12 +42,8 @@ public class NovelController {
     private RedisTemplate<String, Object> redisTemplate;
 
     @RequestMapping("/novel/list")
-    public Response novelList(@VerifiedUser User loginUser,
-                              @RequestParam(name = "wp", required = false) String wp,
+    public Response novelList(@RequestParam(name = "wp", required = false) String wp,
                               @RequestParam(name = "keyWord", required = false, defaultValue = "%") String keyWord) {
-        if (BaseUtils.isEmpty(loginUser)) {
-            return new Response(1003);
-        }
 
         Integer page;
         Integer pageSize = 4;
