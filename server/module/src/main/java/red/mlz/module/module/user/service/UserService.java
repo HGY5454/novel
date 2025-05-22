@@ -26,7 +26,6 @@ public class UserService {
 
     private static final String CipherMode = "AES/ECB/PKCS5Padding";
 
-
     public String decrypt(String sSrc) {
         String secretKey = "123456789";
         try {
