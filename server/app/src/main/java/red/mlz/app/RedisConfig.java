@@ -23,10 +23,8 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // 使用StringRedisSerializer来序列化和反序列化redis的key值
         template.setKeySerializer(new StringRedisSerializer());
 
-        // 使用GenericJackson2JsonRedisSerializer来序列化和反序列化redis的value值
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         template.setHashKeySerializer(new StringRedisSerializer());
