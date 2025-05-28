@@ -1,14 +1,12 @@
 package red.mlz.module.module.kinds.service;
 
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import red.mlz.module.module.kinds.entity.Kinds;
 import red.mlz.module.module.kinds.mapper.KindsMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class KindsService {
+    
     @Resource
     private KindsMapper kindsMapper;
 
@@ -38,6 +37,7 @@ public class KindsService {
     public Kinds getKindsInfoById(BigInteger id) {
         return kindsMapper.getById(id);
     }
+
 
     public Kinds getKindsById(BigInteger id) {
         return kindsMapper.extractById(id);

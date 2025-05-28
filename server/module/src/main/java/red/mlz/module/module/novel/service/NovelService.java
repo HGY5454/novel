@@ -1,11 +1,7 @@
 package red.mlz.module.module.novel.service;
 
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import red.mlz.module.module.kinds.service.KindsService;
 import red.mlz.module.module.novel.entity.Novel;
@@ -17,7 +13,6 @@ import red.mlz.module.module.tag.entity.Tag;
 import red.mlz.module.module.tag.service.TagService;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +29,6 @@ public class NovelService {
     private NovelTagRelationService novelTagRelationService;
     @Autowired
     private KindsService kindsService;
-
-    private JdbcTemplate master;
-
-    private JdbcTemplate slave;
-
 
 
     public Novel getById(BigInteger id) {
