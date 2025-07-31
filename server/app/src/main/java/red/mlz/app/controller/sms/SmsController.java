@@ -24,12 +24,34 @@ public class SmsController {
     public Response send(@RequestParam(name = "phone") BigInteger phone) {
         int result = 1002;
         try {
-            if (SmsSender.sendSms(phone).getBody().getCode()=="ok"){
-                result = 1001;
-                smsRecordService.insertSmsRecord(phone, 1);
+            if (SmsSender.sendSms(phone).getBody().getCode().equals("ok")) {
+                // 使用乐观锁重试机制
+                boolean success = false;
+                int retryCount = 0;
+                while (!success && retryCount < 3) {
+                    try {
+                        result = 1001;
+                        smsRecordService.insertSmsRecordWithOptimisticLock(phone, 1);
+                        success = true;
+                    } catch (RuntimeException e) {
+                        if (e.getMessage().contains("Optimistic lock conflict")) {
+                            retryCount++;
+                            if (retryCount >= 3) {
+                                result = 1003; // 乐观锁冲突错误码
+                                throw e;
+                            }
+                            Thread.sleep(100); // 短暂等待后重试
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            if (result == 1003) {
+                return new Response(result, "操作过于频繁，请稍后再试");
+            }
         }
         return new Response(result);
     }

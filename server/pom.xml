@@ -20,6 +20,9 @@
         <module>console</module>
         <module>app</module>
         <module>module</module>
+        <module>app-consumer</module>
+        <module>console-consumer</module>
+        <module>eureka-server</module>
     </modules>
 
     <properties>
@@ -67,8 +70,19 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2021.0.8</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
 </project>
