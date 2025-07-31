@@ -23,8 +23,13 @@ public interface SmsRecordMapper{
         SmsRecord extractById(@Param("id") Integer id);
 
         int insert(@Param("smsRecord") SmsRecord smsRecord);
+        
+
+        int insertWithVersion(@Param("smsRecord") SmsRecord smsRecord);
 
         int update(@Param("smsRecord") SmsRecord smsRecord);
+
+        int updateWithOptimisticLock(@Param("smsRecord") SmsRecord smsRecord);
 
         @Update("update sms_record set is_deleted = 1 and update_time=#{timestamp} where id = #{id} limit 1")
         int delete(@Param("id") Integer id,

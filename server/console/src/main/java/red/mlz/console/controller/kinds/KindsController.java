@@ -7,11 +7,13 @@ import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import red.mlz.console.config.RabbitMQConfig;
 import red.mlz.console.domain.kinds.KindsTreeVo;
 import red.mlz.module.module.kinds.entity.Kinds;
 import red.mlz.module.module.kinds.service.KindsService;
@@ -33,6 +35,8 @@ public class KindsController {
     private KindsService kindsService;
     @Autowired
     private NovelService novelService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @RequestMapping("/kinds/kinds_info")
     public Response getKinds(@RequestParam(name = "kindsId") BigInteger kindsId) {
@@ -54,14 +58,12 @@ public class KindsController {
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
 
+
     @RequestMapping("/kinds/deleteKinds")
     public Response deleteKinds(@RequestParam(name = "id") BigInteger id) {
         int result = kindsService.deleteKinds(id);
-        List<Novel> novelList = novelService.getNovelByKindsId(id);
-        for (Novel novel : novelList) {
-            BigInteger kindsId = novel.getKindsId();
-            novelService.delete(kindsId);
-        }
+        // 发送删除消息到RabbitMQ
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DELETE_KINDS_QUEUE, id);
         return result == 1 ? new Response<>(1001) : new Response<>(1002);
     }
 

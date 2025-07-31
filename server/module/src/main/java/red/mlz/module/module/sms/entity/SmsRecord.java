@@ -1,7 +1,7 @@
 package red.mlz.module.module.sms.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
+import javax.persistence.Version;
 import java.math.BigInteger;
 
 @Data
@@ -13,4 +13,6 @@ public class SmsRecord{
         private Integer createTime;
         private Integer updateTime;
         private Integer isDeleted;
+        @Version
+        private Integer version;
 }

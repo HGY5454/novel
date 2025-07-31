@@ -9,27 +9,27 @@
                     insert into sms_record
                     (
                         <if test="smsRecord.id !=null "> id,</if>
-                    
+
                         <if test="smsRecord.phone !=null "> phone,</if>
-                    
+
                         <if test="smsRecord.status !=null "> status,</if>
-                    
+
                         <if test="smsRecord.createTime !=null "> create_time,</if>
-                    
+
                         <if test="smsRecord.updateTime !=null "> update_time,</if>
-                    
+
                         <if test="smsRecord.isDeleted !=null "> is_deleted</if>
                     )value(
                         <if test="smsRecord.id !=null "> #{smsRecord.id},</if>
-                    
+
                         <if test="smsRecord.phone !=null "> #{smsRecord.phone},</if>
-                    
+
                         <if test="smsRecord.status !=null "> #{smsRecord.status},</if>
-                    
+
                         <if test="smsRecord.createTime !=null "> #{smsRecord.createTime},</if>
-                    
+
                         <if test="smsRecord.updateTime !=null "> #{smsRecord.updateTime},</if>
-                    
+
                         <if test="smsRecord.isDeleted !=null "> #{smsRecord.isDeleted}</if>
                     )
             </insert>
@@ -37,21 +37,31 @@
                     parameterType="red.mlz.module.module.sms.entity.SmsRecord"
                     useGeneratedKeys="true"
                     keyProperty="id">
-                update sms_record set
-                (
-                <if test="smsRecord.id !=null  and smsRecord.id !=''"> id=#{smsRecord.id},</if>
-                
-                <if test="smsRecord.phone !=null  and smsRecord.phone !=''"> phone=#{smsRecord.phone},</if>
-                
-                <if test="smsRecord.status !=null  and smsRecord.status !=''"> status=#{smsRecord.status},</if>
-                
-                <if test="smsRecord.createTime !=null  and smsRecord.createTime !=''"> create_time=#{smsRecord.createTime},</if>
-                
-                <if test="smsRecord.updateTime !=null  and smsRecord.updateTime !=''"> update_time=#{smsRecord.updateTime},</if>
-                
-                <if test="smsRecord.isDeleted !=null  and smsRecord.isDeleted !=''"> is_deleted=#{smsRecord.isDeleted}</if>
-                )
-                WHERE
-                id=#{smsRecord.id},
+                update sms_record
+                <set>
+                    <if test="smsRecord.id !=null  and smsRecord.id !=''"> id=#{smsRecord.id},</if>
+                    <if test="smsRecord.phone !=null  and smsRecord.phone !=''"> phone=#{smsRecord.phone},</if>
+                    <if test="smsRecord.status !=null  and smsRecord.status !=''"> status=#{smsRecord.status},</if>
+                    <if test="smsRecord.createTime !=null  and smsRecord.createTime !=''"> create_time=#{smsRecord.createTime},</if>
+                    <if test="smsRecord.updateTime !=null  and smsRecord.updateTime !=''"> update_time=#{smsRecord.updateTime},</if>
+                    <if test="smsRecord.isDeleted !=null  and smsRecord.isDeleted !=''"> is_deleted=#{smsRecord.isDeleted},</if>
+                </set>
+                WHERE id=#{smsRecord.id}
+            </update>
+
+            <insert id="insertWithVersion" parameterType="red.mlz.module.module.sms.entity.SmsRecord"
+                    useGeneratedKeys="true" keyProperty="id">
+                INSERT INTO sms_record(phone, status, create_time, update_time, is_deleted, version)
+                VALUES(#{smsRecord.phone}, #{smsRecord.status}, #{smsRecord.createTime},
+                      #{smsRecord.updateTime}, #{smsRecord.isDeleted}, #{smsRecord.version})
+            </insert>
+
+            <update id="updateWithOptimisticLock" parameterType="red.mlz.module.module.sms.entity.SmsRecord">
+                UPDATE sms_record SET
+                phone=#{smsRecord.phone},
+                status=#{smsRecord.status},
+                update_time=#{smsRecord.updateTime},
+                version=version+1
+                WHERE id=#{smsRecord.id} AND version=#{smsRecord.version}
             </update>
 </mapper>
